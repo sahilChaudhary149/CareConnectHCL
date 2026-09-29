@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - CareConnect</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logout {
+            color: white;
+            text-decoration: none;
+            background: #dc2626;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .welcome h2 {
+            color: #1f2937;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #2563eb;
+        }
+
+        .card p {
+            color: #666;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 11px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>CareConnect</h1>
+
+    <a href="/logout" class="logout">Logout</a>
+</div>
+
+<div class="container">
+
+    <div class="welcome">
+        <h2>Admin Dashboard</h2>
+
+        <p>
+            Welcome, <strong th:text="${adminName}"></strong>
+        </p>
+
+        <p>
+            Manage doctor information and check doctor availability.
+        </p>
+    </div>
+
+    <div class="cards">
+
+        <!-- Doctor Information -->
+        <div class="card">
+            <h3>👨‍⚕️ Doctor Information</h3>
+
+            <p>
+                View details of all registered doctors.
+            </p>
+
+            <a href="/admin/doctors" class="button">
+                View Doctors
+            </a>
+        </div>
+
+        <!-- Doctor Availability -->
+        <div class="card">
+            <h3>🕐 Doctor Availability</h3>
+
+            <p>
+                Check doctor's available days, time and current status.
+            </p>
+
+            <a href="/admin/doctors" class="button">
+                Check Availability
+            </a>
+        </div>
+
+        <!-- Doctor Appointments -->
+        <div class="card">
+            <h3>📅 Doctor Appointments</h3>
+
+            <p>
+                View appointments associated with doctors.
+            </p>
+
+            <a href="/appointments" class="button">
+                View Appointments
+            </a>
+        </div>
+
+        <!-- Admin Profile -->
+        <div class="card">
+            <h3>👤 Admin Account</h3>
+
+            <p>
+                You are logged in as an administrator.
+            </p>
+
+            <a href="/logout" class="button">
+                Logout
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -56,6 +56,9 @@ public class HomeController {
             if ("DOCTOR".equals(user.getRole())) {
                 return "redirect:/doctor-dashboard";
             }
+            if ("ADMIN".equals(user.getRole())) {
+                return "redirect:/admin-dashboard";
+            }
         }
 
         return "redirect:/login?error=true";

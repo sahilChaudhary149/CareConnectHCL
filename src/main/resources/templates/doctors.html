@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Information - CareConnect</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #1f2937;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+
+        .unavailable {
+            color: red;
+            font-weight: bold;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>CareConnect - Doctor Information</h1>
+</div>
+
+<div class="container">
+
+    <h2>Registered Doctors</h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Specialization</th>
+                <th>Phone</th>
+                <th>Available Days</th>
+                <th>Available Time</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="doctor : ${doctors}">
+
+                <td th:text="${doctor.id}"></td>
+
+                <td th:text="${doctor.name}"></td>
+
+                <td th:text="${doctor.email}"></td>
+
+                <td th:text="${doctor.specialization != null ? doctor.specialization : 'Not Provided'}"></td>
+
+                <td th:text="${doctor.phone != null ? doctor.phone : 'Not Provided'}"></td>
+
+                <td th:text="${doctor.availableDays != null ? doctor.availableDays : 'Not Provided'}"></td>
+
+                <td th:text="${doctor.availableTime != null ? doctor.availableTime : 'Not Provided'}"></td>
+
+                <td>
+                    <span
+                            th:if="${doctor.availabilityStatus == 'AVAILABLE'}"
+                            class="available"
+                            th:text="${doctor.availabilityStatus}">
+                    </span>
+
+                    <span
+                            th:unless="${doctor.availabilityStatus == 'AVAILABLE'}"
+                            class="unavailable"
+                            th:text="${doctor.availabilityStatus != null ? doctor.availabilityStatus : 'Not Provided'}">
+                    </span>
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="/admin-dashboard" class="back">
+        ← Back to Admin Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>
