@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CareConnect - Medical Records</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
 
         body {
             font-family: Arial, sans-serif;
             background: #f4f8fb;
             margin: 0;
+            padding-bottom: 40px;
         }
 
         .navbar {
@@ -21,106 +25,191 @@
             padding: 18px 40px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar strong {
+            font-size: 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 7px 15px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         h1 {
-            color: #1976d2;
+            color: #1565c0;
+            margin: 0;
+            font-size: 26px;
         }
 
-        .add {
+        .btn-add {
             display: inline-block;
             padding: 10px 18px;
             background: #1976d2;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #1565c0;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
         }
 
-        th,
-        td {
-            padding: 14px;
-            border: 1px solid #ddd;
+        th, td {
+            padding: 14px 16px;
             text-align: left;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         th {
             background: #1976d2;
             color: white;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-    </style>
+        td {
+            font-size: 14px;
+            color: #334155;
+            vertical-align: middle;
+        }
 
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .sub-text {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 18px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .back:hover {
+            background: #e2e8f0;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="navbar">
-
-    <strong>CareConnect</strong>
-
-    <a href="/doctor-dashboard" style="color:white;">
-        Dashboard
-    </a>
-
+    <strong>CareConnect - Clinical Documentation</strong>
+    <a th:href="${dashboardUrl}">Dashboard</a>
 </div>
 
 <div class="container">
 
-    <h1>Medical Records</h1>
+    <div class="header-row">
+        <h1>Medical Records</h1>
+        <a th:if="${canAddRecord}" href="/add-medical-record" class="btn-add">
+            + Add Medical Record
+        </a>
+    </div>
 
-    <a href="/add-medical-record" class="add">
-        + Add Medical Record
+    <div class="table-container">
+
+        <table>
+            <thead>
+            <tr>
+                <th>Record #</th>
+                <th>Patient Details</th>
+                <th>Attending Doctor</th>
+                <th>Diagnosis</th>
+                <th>Clinical Progress Notes</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="record : ${records}">
+                <td><strong th:text="${'#' + record.id}"></strong></td>
+
+                <td>
+                    <strong th:text="${userMap[record.patientId] != null ? userMap[record.patientId].name : 'Patient #' + record.patientId}"></strong>
+                    <div class="sub-text" th:if="${userMap[record.patientId] != null && userMap[record.patientId].email != null}" th:text="${userMap[record.patientId].email}"></div>
+                </td>
+
+                <td>
+                    <strong th:text="${userMap[record.doctorId] != null ? userMap[record.doctorId].name : 'Doctor #' + record.doctorId}"></strong>
+                    <div class="sub-text" th:if="${userMap[record.doctorId] != null && userMap[record.doctorId].specialization != null}" th:text="${userMap[record.doctorId].specialization}"></div>
+                </td>
+
+                <td>
+                    <strong th:text="${record.diagnosis}"></strong>
+                </td>
+
+                <td th:text="${record.clinicalNotes}"></td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(records)}">
+                <td colspan="5" style="text-align: center; color: #888; padding: 25px;">
+                    No medical records found.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <a th:href="${dashboardUrl}" class="back">
+        ← Back to Dashboard
     </a>
-
-    <table>
-
-        <thead>
-
-        <tr>
-            <th>ID</th>
-            <th>Patient ID</th>
-            <th>Doctor ID</th>
-            <th>Diagnosis</th>
-            <th>Clinical Notes</th>
-        </tr>
-
-        </thead>
-
-        <tbody>
-
-        <tr th:each="record : ${records}">
-
-            <td th:text="${record.id}"></td>
-
-            <td th:text="${record.patientId}"></td>
-
-            <td th:text="${record.doctorId}"></td>
-
-            <td th:text="${record.diagnosis}"></td>
-
-            <td th:text="${record.clinicalNotes}"></td>
-
-        </tr>
-
-        </tbody>
-
-    </table>
 
 </div>
 
 </body>
-
 </html>

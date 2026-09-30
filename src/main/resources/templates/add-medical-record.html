@@ -1,67 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CareConnect - Add Medical Record</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
 
         body {
             font-family: Arial, sans-serif;
-            background: #f4f8fb;
+            background: linear-gradient(135deg, #e8f0fe 0%, #f4f8fb 100%);
             margin: 0;
+            padding: 40px 15px;
+            min-height: 100vh;
         }
 
         .container {
-            width: 500px;
-            margin: 60px auto;
+            max-width: 550px;
+            margin: 0 auto;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            padding: 35px 30px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e1e8f0;
         }
 
         h1 {
-            color: #1976d2;
+            color: #1565c0;
             text-align: center;
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        .doctor-badge {
+            background: #eff6ff;
+            border-left: 4px solid #1976d2;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            color: #1e3a8a;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-top: 15px;
-            font-weight: bold;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
         }
 
-        input,
-        textarea {
+        input, select, textarea {
             width: 100%;
-            padding: 11px;
-            margin-top: 7px;
+            padding: 11px 13px;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
         }
 
         textarea {
-            height: 130px;
+            height: 120px;
             resize: vertical;
         }
 
         button {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 12px;
             background: #1976d2;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 7px;
             cursor: pointer;
+            font-size: 15.5px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.25);
+            transition: background 0.2s;
         }
 
-    </style>
+        button:hover {
+            background: #1565c0;
+        }
 
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            text-decoration: none;
+            color: #1976d2;
+            font-size: 14px;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
 <body>
@@ -70,40 +120,44 @@
 
     <h1>Add Medical Record</h1>
 
-    <form action="/add-medical-record" method="post">
+    <div class="doctor-badge">
+        <span>Attending Doctor:</span>
+        <strong th:text="${doctorName}">Doctor</strong>
+    </div>
 
-        <label>Patient ID</label>
+    <form action="/add-medical-record" method="post" th:object="${medicalRecord}">
 
-        <input
-                type="number"
-                name="patientId"
-                required
-        >
+        <!-- Hidden Doctor ID -->
+        <input type="hidden" th:field="*{doctorId}">
 
-        <label>Doctor ID</label>
+        <!-- Patient Selection Dropdown -->
+        <div class="form-group">
+            <label for="patientSelect">Select Patient</label>
+            <select th:field="*{patientId}" id="patientSelect" required>
+                <option value="">-- Choose Patient --</option>
+                <option th:each="patient : ${patients}"
+                        th:value="${patient.id}"
+                        th:text="${patient.name + ' (' + patient.email + ') - ID #' + patient.id}">
+                </option>
+            </select>
+        </div>
 
-        <input
-                type="number"
-                name="doctorId"
-                required
-        >
+        <div class="form-group">
+            <label for="diagnosis">Clinical Diagnosis</label>
+            <input type="text"
+                   th:field="*{diagnosis}"
+                   id="diagnosis"
+                   placeholder="e.g. Acute Bronchitis, Type 2 Diabetes, Hypertension..."
+                   required>
+        </div>
 
-        <label>Diagnosis</label>
-
-        <input
-                type="text"
-                name="diagnosis"
-                placeholder="Enter diagnosis"
-                required
-        >
-
-        <label>Clinical Notes</label>
-
-        <textarea
-                name="clinicalNotes"
-                placeholder="Enter clinical notes"
-                required>
-        </textarea>
+        <div class="form-group">
+            <label for="clinicalNotes">Clinical Notes & Observations</label>
+            <textarea th:field="*{clinicalNotes}"
+                      id="clinicalNotes"
+                      placeholder="Enter detailed clinical findings, symptoms, and treatment plan..."
+                      required></textarea>
+        </div>
 
         <button type="submit">
             Save Medical Record
@@ -111,8 +165,11 @@
 
     </form>
 
+    <a th:href="${dashboardUrl}" class="back">
+        ← Back to Dashboard
+    </a>
+
 </div>
 
 </body>
-
 </html>
