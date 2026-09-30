@@ -3,74 +3,148 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment - CareConnect</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
+            background: linear-gradient(135deg, #e8f0fe 0%, #f4f8fb 100%);
             margin: 0;
+            padding: 30px 15px;
+            min-height: 100vh;
         }
 
         .navbar {
             background: #0d6efd;
             color: white;
-            padding: 18px 40px;
-            font-size: 22px;
-            font-weight: bold;
+            padding: 16px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px;
+            max-width: 580px;
+            margin: 0 auto 25px;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
         }
 
         .container {
-            width: 450px;
-            margin: 50px auto;
+            max-width: 580px;
+            margin: 0 auto;
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 35px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e1e8f0;
         }
 
         h2 {
+            margin-top: 0;
+            color: #0d47a1;
+            font-size: 24px;
             text-align: center;
-            color: #0d6efd;
+        }
+
+        .patient-badge {
+            background: #eff6ff;
+            border-left: 4px solid #0d6efd;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 22px;
+            font-size: 14px;
+            color: #1e3a8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            margin-top: 15px;
-            font-weight: bold;
+            margin-bottom: 7px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
         }
 
-        input, textarea {
+        select, input, textarea {
             width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #1e293b;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
         }
 
         button {
             width: 100%;
-            margin-top: 25px;
-            padding: 12px;
+            margin-top: 15px;
+            padding: 13px;
             background: #0d6efd;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+            transition: background 0.2s, transform 0.15s;
         }
 
         button:hover {
             background: #0b5ed7;
+            transform: translateY(-1px);
         }
 
         .back {
             display: block;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 18px;
             text-decoration: none;
             color: #0d6efd;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -78,51 +152,81 @@
 <body>
 
 <div class="navbar">
-    CareConnect
+    <span>CareConnect - EHR</span>
+    <a href="/patient-dashboard">Dashboard</a>
 </div>
 
 <div class="container">
 
-    <h2>Book Appointment</h2>
+    <h2>Book an Appointment</h2>
+
+    <!-- Logged in Patient Banner -->
+    <div class="patient-badge">
+        <span>Booking for Patient:</span>
+        <strong th:text="${patientName}">Patient</strong>
+    </div>
 
     <form th:action="@{/book-appointment}"
           th:object="${appointment}"
           method="post">
 
-        <label>Patient ID</label>
-        <input type="number"
-               th:field="*{patientId}"
-               placeholder="Enter Patient ID"
-               required>
+        <!-- Hidden Patient ID automatically attached -->
+        <input type="hidden" th:field="*{patientId}">
 
-        <label>Doctor ID</label>
-        <input type="number"
-               th:field="*{doctorId}"
-               placeholder="Enter Doctor ID"
-               required>
+        <!-- Doctor Dropdown Selector -->
+        <div class="form-group">
+            <label for="doctorSelect">Select Doctor / Medical Specialist</label>
+            <select th:field="*{doctorId}" id="doctorSelect" required>
+                <option value="">-- Choose a Medical Specialist --</option>
+                <option th:each="doc : ${doctors}"
+                        th:value="${doc.id}"
+                        th:text="${doc.name + ' (' + (doc.specialization != null ? doc.specialization : 'General Medicine') + ') — ' + (doc.availableDays != null ? doc.availableDays : 'Mon-Fri') + ' [' + (doc.availableTime != null ? doc.availableTime : 'Regular Hours') + ']' + (doc.availabilityStatus == 'AVAILABLE' ? ' ● Available' : ' (Off Duty)')}">
+                </option>
+            </select>
+            <div class="helper-text">Select your preferred doctor based on their specialization and clinic availability.</div>
+        </div>
 
-        <label>Appointment Date</label>
-        <input type="datetime-local"
-               th:field="*{appointmentDate}"
-               required>
+        <!-- Appointment Date & Time Picker -->
+        <div class="form-group">
+            <label for="appointmentDateInput">Preferred Date & Time</label>
+            <input type="datetime-local"
+                   th:field="*{appointmentDate}"
+                   id="appointmentDateInput"
+                   required>
+            <div class="helper-text">Select appointment date and slot timing.</div>
+        </div>
 
-        <label>Reason for Visit</label>
-        <textarea th:field="*{reason}"
-                  placeholder="Enter reason for appointment"
-                  rows="4"
-                  required></textarea>
+        <!-- Reason for Consultation -->
+        <div class="form-group">
+            <label for="reasonInput">Reason for Visit / Symptoms</label>
+            <textarea th:field="*{reason}"
+                      id="reasonInput"
+                      placeholder="e.g. Regular health checkup, persistent headache for 2 days, follow-up..."
+                      rows="4"
+                      required></textarea>
+        </div>
 
         <button type="submit">
-            Book Appointment
+            Confirm & Book Appointment →
         </button>
 
     </form>
 
     <a href="/patient-dashboard" class="back">
-        Back to Patient Dashboard
+        ← Back to Patient Dashboard
     </a>
 
 </div>
+
+<script>
+    // Ensure booking date cannot be in the past
+    window.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('appointmentDateInput');
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        dateInput.min = now.toISOString().slice(0, 16);
+    });
+</script>
 
 </body>
 </html>

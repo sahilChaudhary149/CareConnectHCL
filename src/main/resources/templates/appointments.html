@@ -3,79 +3,206 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointments - CareConnect</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background: #f4f7fb;
             margin: 0;
+            padding-bottom: 40px;
         }
 
         .navbar {
             background: #0d6efd;
             color: white;
             padding: 18px 40px;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 7px 15px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-left: 10px;
         }
 
         .container {
-            width: 90%;
-            margin: 40px auto;
+            width: 92%;
+            max-width: 1250px;
+            margin: 35px auto;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         h2 {
-            text-align: center;
-            color: #0d6efd;
+            margin: 0;
+            color: #0d47a1;
+            font-size: 26px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
         }
 
         th {
             background: #0d6efd;
             color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .status {
-            font-weight: bold;
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #334155;
+            vertical-align: middle;
         }
 
-        .confirm {
-            background: #198754;
-            color: white;
-            padding: 7px 12px;
-            text-decoration: none;
-            border-radius: 5px;
+        tr:hover {
+            background: #f8fafc;
         }
 
-        .reject {
-            background: #dc3545;
-            color: white;
-            padding: 7px 12px;
-            text-decoration: none;
-            border-radius: 5px;
+        .sub-text {
+            color: #64748b;
+            font-size: 12.5px;
+            margin-top: 3px;
         }
 
-        .back {
+        /* Status Badges */
+        .status-badge {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 18px;
-            background: #0d6efd;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .status-confirmed {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-pending {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fef08a;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Actions */
+        .actions-cell {
+            white-space: nowrap;
+        }
+
+        .btn-confirm {
+            background: #16a34a;
             color: white;
+            padding: 7px 13px;
             text-decoration: none;
             border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-right: 5px;
+            transition: background 0.2s;
+        }
+
+        .btn-confirm:hover {
+            background: #15803d;
+        }
+
+        .btn-reject {
+            background: #dc2626;
+            color: white;
+            padding: 7px 13px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-reject:hover {
+            background: #b91c1c;
+        }
+
+        /* Bottom Nav Buttons */
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-action {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-primary-action:hover {
+            background: #0b5ed7;
+        }
+
+        .btn-secondary-action {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary-action:hover {
+            background: #e2e8f0;
         }
     </style>
 </head>
@@ -83,82 +210,136 @@
 <body>
 
 <div class="navbar">
-    CareConnect - Appointments
+    <span>CareConnect - Appointment Management</span>
+    <div class="navbar-links">
+        <a th:if="${isAdmin}" href="/admin-dashboard">Admin Dashboard</a>
+        <a th:if="${isDoctor}" href="/doctor-dashboard">Doctor Dashboard</a>
+        <a th:if="${isPatient}" href="/patient-dashboard">Patient Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
 </div>
 
 <div class="container">
 
-    <h2>Appointment List</h2>
+    <div class="header-row">
+        <h2>
+            <span th:if="${isAdmin}">All Hospital Appointments</span>
+            <span th:if="${isDoctor}">Doctor's Assigned Appointments</span>
+            <span th:if="${isPatient}">My Booked Appointments</span>
+        </h2>
 
-    <table>
+        <a th:if="${isPatient}" href="/book-appointment" class="btn-primary-action">
+            + Book New Appointment
+        </a>
+    </div>
 
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Patient ID</th>
-            <th>Doctor ID</th>
-            <th>Date & Time</th>
-            <th>Reason</th>
-            <th>Status</th>
-            <th th:if="${isDoctor}">Action</th>
-        </tr>
-        </thead>
+    <div class="table-container">
 
-        <tbody>
+        <table>
 
-        <tr th:each="appointment : ${appointments}">
+            <thead>
+            <tr>
+                <th>Appt #</th>
+                <th>Patient Name</th>
+                <th>Doctor / Specialist</th>
+                <th>Scheduled Date & Time</th>
+                <th>Reason for Visit</th>
+                <th>Status</th>
+                <th th:if="${isDoctor || isAdmin}">Actions</th>
+            </tr>
+            </thead>
 
-            <td th:text="${appointment.id}"></td>
+            <tbody>
 
-            <td th:text="${appointment.patientId}"></td>
+            <tr th:each="appointment : ${appointments}">
 
-            <td th:text="${appointment.doctorId}"></td>
+                <!-- Appt ID -->
+                <td>
+                    <strong th:text="${'#' + appointment.id}"></strong>
+                </td>
 
-            <td th:text="${appointment.appointmentDate}"></td>
+                <!-- Patient Details -->
+                <td>
+                    <strong th:text="${appointment.patientName}"></strong>
+                    <div class="sub-text" th:if="${appointment.patientPhone != null && !appointment.patientPhone.isEmpty()}" th:text="${'📞 ' + appointment.patientPhone}"></div>
+                    <div class="sub-text" th:if="${appointment.patientEmail != null && !appointment.patientEmail.isEmpty()}" th:text="${appointment.patientEmail}"></div>
+                </td>
 
-            <td th:text="${appointment.reason}"></td>
+                <!-- Doctor Details -->
+                <td>
+                    <strong th:text="${appointment.doctorName}"></strong>
+                    <div class="sub-text" th:text="${'Specialty: ' + appointment.doctorSpecialization}"></div>
+                </td>
 
-            <td class="status"
-                th:text="${appointment.status}">
-            </td>
+                <!-- Appointment Date -->
+                <td th:text="${appointment.appointmentDate}"></td>
 
-            <td th:if="${isDoctor}">
+                <!-- Reason -->
+                <td th:text="${appointment.reason}"></td>
 
-                <a class="confirm"
-                   th:href="@{/appointment/confirm/{id}(id=${appointment.id})}">
-                    Confirm
-                </a>
+                <!-- Status Badge -->
+                <td>
+                    <span th:if="${appointment.status == 'CONFIRMED'}" class="status-badge status-confirmed">
+                        ● CONFIRMED
+                    </span>
+                    <span th:if="${appointment.status == 'PENDING'}" class="status-badge status-pending">
+                        ⏳ PENDING
+                    </span>
+                    <span th:if="${appointment.status == 'REJECTED'}" class="status-badge status-rejected">
+                        ✕ REJECTED
+                    </span>
+                    <span th:if="${appointment.status != 'CONFIRMED' && appointment.status != 'PENDING' && appointment.status != 'REJECTED'}"
+                          class="status-badge status-pending"
+                          th:text="${appointment.status}">
+                    </span>
+                </td>
 
-                <a class="reject"
-                   th:href="@{/appointment/reject/{id}(id=${appointment.id})}">
-                    Reject
-                </a>
+                <!-- Doctor / Admin Actions -->
+                <td th:if="${isDoctor || isAdmin}" class="actions-cell">
+                    <a th:if="${appointment.status != 'CONFIRMED'}"
+                       class="btn-confirm"
+                       th:href="@{/appointment/confirm/{id}(id=${appointment.id})}">
+                        ✓ Confirm
+                    </a>
 
-            </td>
+                    <a th:if="${appointment.status != 'REJECTED'}"
+                       class="btn-reject"
+                       th:href="@{/appointment/reject/{id}(id=${appointment.id})}">
+                        ✕ Reject
+                    </a>
+                </td>
 
-        </tr>
+            </tr>
 
-        </tbody>
+            <tr th:if="${#lists.isEmpty(appointments)}">
+                <td colspan="7" style="text-align: center; color: #888; padding: 30px;">
+                    No appointments found.
+                </td>
+            </tr>
 
-    </table>
+            </tbody>
 
-    <a th:if="${!isDoctor}"
-       href="/book-appointment"
-       class="back">
-        + Book New Appointment
-    </a>
+        </table>
 
-    <a th:if="${isDoctor}"
-       href="/doctor-dashboard"
-       class="back">
-        Back to Dashboard
-    </a>
+    </div>
 
-    <a th:if="${!isDoctor}"
-       href="/patient-dashboard"
-       class="back">
-        Back to Dashboard
-    </a>
+    <!-- Navigation Buttons based on Role -->
+    <div class="nav-actions">
+        <!-- Admin Back Link -->
+        <a th:if="${isAdmin}" href="/admin-dashboard" class="btn-secondary-action">
+            ← Back to Admin Dashboard
+        </a>
+
+        <!-- Doctor Back Link -->
+        <a th:if="${isDoctor}" href="/doctor-dashboard" class="btn-secondary-action">
+            ← Back to Doctor Dashboard
+        </a>
+
+        <!-- Patient Back Link -->
+        <a th:if="${isPatient}" href="/patient-dashboard" class="btn-secondary-action">
+            ← Back to Patient Dashboard
+        </a>
+    </div>
 
 </div>
 

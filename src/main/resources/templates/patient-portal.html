@@ -85,9 +85,9 @@
 
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Doctor ID</th>
-            <th>Date & Time</th>
+            <th>Appt #</th>
+            <th>Doctor / Specialist</th>
+            <th>Scheduled Date & Time</th>
             <th>Reason</th>
             <th>Status</th>
         </tr>
@@ -97,16 +97,27 @@
 
         <tr th:each="appointment : ${appointments}">
 
-            <td th:text="${appointment.id}"></td>
+            <td><strong th:text="${'#' + appointment.id}"></strong></td>
 
-            <td th:text="${appointment.doctorId}"></td>
+            <td>
+                <strong th:text="${appointment.doctorName}"></strong>
+                <div style="font-size:12px; color:#64748b;" th:text="${appointment.doctorSpecialization}"></div>
+            </td>
 
             <td th:text="${appointment.appointmentDate}"></td>
 
             <td th:text="${appointment.reason}"></td>
 
-            <td th:text="${appointment.status}"></td>
+            <td>
+                <strong th:text="${appointment.status}"
+                        th:style="${appointment.status == 'CONFIRMED' ? 'color:#15803d;' : (appointment.status == 'REJECTED' ? 'color:#b91c1c;' : 'color:#854d0e;')}">
+                </strong>
+            </td>
 
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(appointments)}">
+            <td colspan="5" style="color:#888; padding:20px;">No appointments booked yet.</td>
         </tr>
 
         </tbody>
@@ -122,8 +133,8 @@
 
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Doctor ID</th>
+            <th>Record #</th>
+            <th>Attending Doctor</th>
             <th>Diagnosis</th>
             <th>Clinical Notes</th>
         </tr>
@@ -133,14 +144,21 @@
 
         <tr th:each="record : ${medicalRecords}">
 
-            <td th:text="${record.id}"></td>
+            <td><strong th:text="${'#' + record.id}"></strong></td>
 
-            <td th:text="${record.doctorId}"></td>
+            <td>
+                <strong th:text="${doctorMap[record.doctorId] != null ? doctorMap[record.doctorId].name : 'Doctor #' + record.doctorId}"></strong>
+                <div style="font-size:12px; color:#64748b;" th:if="${doctorMap[record.doctorId] != null}" th:text="${doctorMap[record.doctorId].specialization}"></div>
+            </td>
 
             <td th:text="${record.diagnosis}"></td>
 
             <td th:text="${record.clinicalNotes}"></td>
 
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(medicalRecords)}">
+            <td colspan="4" style="color:#888; padding:20px;">No medical records available.</td>
         </tr>
 
         </tbody>
@@ -156,8 +174,8 @@
 
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Doctor ID</th>
+            <th>Rx #</th>
+            <th>Prescribing Doctor</th>
             <th>Medicine</th>
             <th>Dosage</th>
             <th>Duration</th>
@@ -169,11 +187,13 @@
 
         <tr th:each="prescription : ${prescriptions}">
 
-            <td th:text="${prescription.id}"></td>
+            <td><strong th:text="${'#' + prescription.id}"></strong></td>
 
-            <td th:text="${prescription.doctorId}"></td>
+            <td>
+                <strong th:text="${doctorMap[prescription.doctorId] != null ? doctorMap[prescription.doctorId].name : 'Doctor #' + prescription.doctorId}"></strong>
+            </td>
 
-            <td th:text="${prescription.medicineName}"></td>
+            <td><strong th:text="${prescription.medicineName}"></strong></td>
 
             <td th:text="${prescription.dosage}"></td>
 
@@ -181,6 +201,10 @@
 
             <td th:text="${prescription.instructions}"></td>
 
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(prescriptions)}">
+            <td colspan="6" style="color:#888; padding:20px;">No prescriptions found.</td>
         </tr>
 
         </tbody>
