@@ -5,7 +5,7 @@ import com.careconnect.careconnect.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class AdminController {
         return "admin-dashboard";
     }
 
-    // Doctor Information
+    // Doctor Information & Directory
     @GetMapping("/admin/doctors")
     public String doctorInformation(HttpSession session, Model model) {
 
@@ -57,6 +57,84 @@ public class AdminController {
 
         return "doctors";
     }
+
+    // Doctor Availability & Duty Schedule Management
+    @GetMapping("/admin/availability")
+    public String doctorAvailability(HttpSession session, Model model) {
+
+        User user = (User) session.getAttribute("loggedInUser");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        if (!"ADMIN".equals(user.getRole())) {
+            return "redirect:/";
+        }
+
+        List<User> doctors = userRepository.findByRole("DOCTOR");
+
+        long availableCount = doctors.stream()
+                .filter(d -> "AVAILABLE".equalsIgnoreCase(d.getAvailabilityStatus()))
+                .count();
+
+        model.addAttribute("doctors", doctors);
+        model.addAttribute("totalDoctors", doctors.size());
+        model.addAttribute("availableCount", availableCount);
+        model.addAttribute("unavailableCount", doctors.size() - availableCount);
+
+        return "doctor-availability";
+    }
+
+    // Toggle Doctor Availability Status (One-click On Duty / Off Duty)
+    @GetMapping("/admin/availability/toggle/{id}")
+    public String toggleAvailability(@PathVariable Long id, HttpSession session) {
+
+        User user = (User) session.getAttribute("loggedInUser");
+
+        if (user == null || !"ADMIN".equals(user.getRole())) {
+            return "redirect:/login";
+        }
+
+        User doctor = userRepository.findById(id).orElse(null);
+        if (doctor != null) {
+            if ("AVAILABLE".equalsIgnoreCase(doctor.getAvailabilityStatus())) {
+                doctor.setAvailabilityStatus("UNAVAILABLE");
+            } else {
+                doctor.setAvailabilityStatus("AVAILABLE");
+            }
+            userRepository.save(doctor);
+        }
+
+        return "redirect:/admin/availability";
+    }
+
+    // Update Doctor Working Days & Timings
+    @PostMapping("/admin/availability/update")
+    public String updateSchedule(
+            @RequestParam Long doctorId,
+            @RequestParam String availableDays,
+            @RequestParam String availableTime,
+            @RequestParam String availabilityStatus,
+            HttpSession session) {
+
+        User user = (User) session.getAttribute("loggedInUser");
+
+        if (user == null || !"ADMIN".equals(user.getRole())) {
+            return "redirect:/login";
+        }
+
+        User doctor = userRepository.findById(doctorId).orElse(null);
+        if (doctor != null) {
+            doctor.setAvailableDays(availableDays);
+            doctor.setAvailableTime(availableTime);
+            doctor.setAvailabilityStatus(availabilityStatus);
+            userRepository.save(doctor);
+        }
+
+        return "redirect:/admin/availability?saved=true";
+    }
+
     // Patient Information
     @GetMapping("/admin/patients")
     public String patientInformation(HttpSession session, Model model) {

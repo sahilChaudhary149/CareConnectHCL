@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Availability - CareConnect</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 20px 40px;
+        }
+
+        .title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h2 {
+            color: #1f2937;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Stat Badges */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+        }
+
+        .stat-info .num {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-info .label {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* Table Styling */
+        .table-container {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-available {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-unavailable {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Action Buttons */
+        .btn-toggle {
+            display: inline-block;
+            padding: 7px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-toggle-on {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-toggle-on:hover {
+            background: #15803d;
+        }
+
+        .btn-toggle-off {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-toggle-off:hover {
+            background: #b91c1c;
+        }
+
+        .btn-edit {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: 500;
+            margin-left: 6px;
+        }
+
+        .btn-edit:hover {
+            background: #e2e8f0;
+        }
+
+        .actions-cell {
+            white-space: nowrap;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #bbf7d0;
+            font-size: 14px;
+        }
+
+        /* Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #1f2937;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>CareConnect - Doctor Availability & Duty Schedule</h1>
+    <a href="/logout" style="color: white; text-decoration: none; background: #dc2626; padding: 7px 14px; border-radius: 5px; font-size: 13px;">Logout</a>
+</div>
+
+<div class="container">
+
+    <div class="title-bar">
+        <h2>Schedule & On-Duty Status</h2>
+    </div>
+
+    <!-- Alert -->
+    <div th:if="${param.saved}" class="alert-success">
+        ✓ Doctor schedule & availability updated successfully!
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <span class="stat-icon">👨‍⚕️</span>
+            <div class="stat-info">
+                <div class="num" th:text="${totalDoctors}">0</div>
+                <div class="label">Total Doctors</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon">🟢</span>
+            <div class="stat-info">
+                <div class="num" th:text="${availableCount}" style="color: #16a34a;">0</div>
+                <div class="label">On Duty (Available)</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon">🔴</span>
+            <div class="stat-info">
+                <div class="num" th:text="${unavailableCount}" style="color: #dc2626;">0</div>
+                <div class="label">Off Duty (Unavailable)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Availability Table -->
+    <div class="table-container">
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Available Days</th>
+                <th>Shift Hours</th>
+                <th>Duty Status</th>
+                <th>Quick Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="doctor : ${doctors}">
+                <td th:text="${doctor.id}"></td>
+                <td>
+                    <strong th:text="${doctor.name}"></strong><br>
+                    <small style="color: #64748b;" th:text="${doctor.email}"></small>
+                </td>
+                <td th:text="${doctor.specialization != null && !doctor.specialization.isEmpty() ? doctor.specialization : 'General'}"></td>
+                <td th:text="${doctor.availableDays != null && !doctor.availableDays.isEmpty() ? doctor.availableDays : 'Not Scheduled'}"></td>
+                <td th:text="${doctor.availableTime != null && !doctor.availableTime.isEmpty() ? doctor.availableTime : 'Not Scheduled'}"></td>
+
+                <td>
+                    <span th:if="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-available">
+                        ● AVAILABLE
+                    </span>
+                    <span th:unless="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-unavailable">
+                        ● UNAVAILABLE
+                    </span>
+                </td>
+
+                <td class="actions-cell">
+                    <!-- Toggle Status Button -->
+                    <a th:if="${doctor.availabilityStatus == 'AVAILABLE'}"
+                       th:href="@{/admin/availability/toggle/{id}(id=${doctor.id})}"
+                       class="btn-toggle btn-toggle-off"
+                       title="Click to mark Off Duty">
+                        Set Off Duty
+                    </a>
+
+                    <a th:unless="${doctor.availabilityStatus == 'AVAILABLE'}"
+                       th:href="@{/admin/availability/toggle/{id}(id=${doctor.id})}"
+                       class="btn-toggle btn-toggle-on"
+                       title="Click to mark On Duty">
+                        Set On Duty
+                    </a>
+
+                    <!-- Edit Schedule Button -->
+                    <button type="button" class="btn-edit"
+                            th:attr="data-id=${doctor.id},
+                                     data-name=${doctor.name},
+                                     data-days=${doctor.availableDays},
+                                     data-time=${doctor.availableTime},
+                                     data-status=${doctor.availabilityStatus}"
+                            onclick="openEditModal(this)">
+                        ✏ Edit Hours
+                    </button>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(doctors)}">
+                <td colspan="7" style="text-align: center; color: #888; padding: 25px;">No registered doctors found.</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <a href="/admin-dashboard" class="back">
+        ← Back to Admin Dashboard
+    </a>
+
+</div>
+
+<!-- Schedule Edit Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <h3>Edit Doctor Schedule</h3>
+        <p id="modalDoctorName" style="color: #64748b; font-size: 14px; margin-top: -5px; margin-bottom: 18px;"></p>
+
+        <form action="/admin/availability/update" method="post">
+            <input type="hidden" name="doctorId" id="modalDoctorId">
+
+            <div class="form-group">
+                <label>Available Days</label>
+                <input type="text" name="availableDays" id="modalDays" placeholder="e.g. Mon - Fri" required>
+            </div>
+
+            <div class="form-group">
+                <label>Shift / Available Hours</label>
+                <input type="text" name="availableTime" id="modalTime" placeholder="e.g. 09:00 AM - 05:00 PM" required>
+            </div>
+
+            <div class="form-group">
+                <label>Duty Status</label>
+                <select name="availabilityStatus" id="modalStatus" required>
+                    <option value="AVAILABLE">AVAILABLE (On Duty)</option>
+                    <option value="UNAVAILABLE">UNAVAILABLE (Off Duty)</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal(btn) {
+        document.getElementById('modalDoctorId').value = btn.getAttribute('data-id');
+        document.getElementById('modalDoctorName').textContent = 'Updating schedule for ' + btn.getAttribute('data-name');
+        document.getElementById('modalDays').value = btn.getAttribute('data-days') || 'Mon - Fri';
+        document.getElementById('modalTime').value = btn.getAttribute('data-time') || '09:00 AM - 05:00 PM';
+        document.getElementById('modalStatus').value = btn.getAttribute('data-status') || 'AVAILABLE';
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Close modal if clicked outside
+    window.onclick = function(e) {
+        const modal = document.getElementById('editModal');
+        if (e.target === modal) {
+            closeEditModal();
+        }
+    };
+</script>
+
+</body>
+</html>
