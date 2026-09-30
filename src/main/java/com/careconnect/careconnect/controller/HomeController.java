@@ -28,7 +28,8 @@ public class HomeController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user) {
         userService.registerUser(user);
-        return "redirect:/login";
+        String roleParam = (user.getRole() != null && !user.getRole().isEmpty()) ? user.getRole() : "PATIENT";
+        return "redirect:/login?registered=true&role=" + roleParam;
     }
 
     @GetMapping("/login")
@@ -40,11 +41,17 @@ public class HomeController {
     public String loginUser(
             @RequestParam String email,
             @RequestParam String password,
+            @RequestParam(required = false) String role,
             HttpSession session) {
 
         User user = userService.loginUser(email, password);
 
         if (user != null) {
+
+            // Validate against selected dashboard role if specified
+            if (role != null && !role.trim().isEmpty() && !role.equalsIgnoreCase(user.getRole())) {
+                return "redirect:/login?error=role_mismatch&expectedRole=" + role + "&actualRole=" + user.getRole();
+            }
 
             // Store logged-in user
             session.setAttribute("loggedInUser", user);
@@ -61,7 +68,8 @@ public class HomeController {
             }
         }
 
-        return "redirect:/login?error=true";
+        String roleQuery = (role != null && !role.trim().isEmpty()) ? "&role=" + role : "";
+        return "redirect:/login?error=invalid" + roleQuery;
     }
 
     @GetMapping("/patient-dashboard")

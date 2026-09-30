@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Information - CareConnect</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #1f2937;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>CareConnect - Patient Information</h1>
+</div>
+
+<div class="container">
+
+    <h2>Registered Patients</h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="patient : ${patients}">
+
+                <td th:text="${patient.id}"></td>
+
+                <td th:text="${patient.name}"></td>
+
+                <td th:text="${patient.email}"></td>
+
+                <td th:text="${patient.phone != null && !patient.phone.isEmpty() ? patient.phone : 'Not Provided'}"></td>
+
+                <td th:text="${patient.role}"></td>
+
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(patients)}">
+                <td colspan="5" style="text-align:center; color:#888; padding:20px;">No registered patients found.</td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="/admin-dashboard" class="back">
+        ← Back to Admin Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

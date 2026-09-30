@@ -1,111 +1,518 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CareConnect - Login</title>
+    <title>CareConnect - Portal Login</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f8fb;
+            background: linear-gradient(135deg, #e8f0fe 0%, #f4f8fb 100%);
+            margin: 0;
+            padding: 30px 15px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 12px 35px rgba(25, 118, 210, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+            padding: 35px 32px;
+            border: 1px solid #e1e8f0;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 50%;
+            font-size: 28px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.15);
+        }
+
+        .brand-header h1 {
+            color: #0d47a1;
+            font-size: 28px;
+            margin: 0 0 6px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-header p {
+            color: #64748b;
+            font-size: 14px;
             margin: 0;
         }
 
-        .container {
-            width: 400px;
-            margin: 100px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        /* Role Selector Tabs */
+        .role-selector-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        h1 {
-            text-align: center;
+        .role-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .role-tab {
+            background: transparent;
+            border: none;
+            padding: 10px 6px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .role-tab span.icon {
+            font-size: 18px;
+        }
+
+        .role-tab:hover {
+            color: #0d47a1;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .role-tab.active {
+            background: #ffffff;
             color: #1976d2;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #cbd5e1;
         }
 
-        h3 {
-            text-align: center;
-            color: #333;
+        .role-tab.active[data-role="PATIENT"] {
+            color: #0284c7;
+            border-color: #38bdf8;
+        }
+
+        .role-tab.active[data-role="DOCTOR"] {
+            color: #059669;
+            border-color: #34d399;
+        }
+
+        .role-tab.active[data-role="ADMIN"] {
+            color: #7c3aed;
+            border-color: #a78bfa;
+        }
+
+        /* Dynamic Role Banner */
+        .portal-indicator {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border-left: 4px solid #1976d2;
+            color: #334155;
+            transition: all 0.2s;
+        }
+
+        .portal-indicator strong {
+            color: #0f172a;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-top: 15px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
         }
 
-        input {
-            width: 100%;
-            padding: 11px;
-            margin-top: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
-        button {
+        .input-wrapper input {
             width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background: #1976d2;
-            color: white;
+            padding: 12px 14px;
+            font-size: 14.5px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1e293b;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
             border: none;
-            border-radius: 5px;
+            color: #64748b;
             cursor: pointer;
-            font-size: 16px;
+            padding: 4px;
+            font-size: 15px;
         }
 
-        button:hover {
-            background: #125ca1;
+        .toggle-password:hover {
+            color: #1e293b;
         }
 
-        .register {
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            background: #1976d2;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15.5px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #1565c0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(25, 118, 210, 0.35);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* Demo Fill Section */
+        .demo-section {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px dashed #e2e8f0;
             text-align: center;
-            margin-top: 20px;
         }
 
-        .register a {
+        .demo-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .demo-chips {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .demo-chip {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .demo-chip:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Footer Links */
+        .login-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .login-footer a {
             color: #1976d2;
             text-decoration: none;
+            font-weight: 600;
         }
 
-        .error {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .back-home:hover {
+            color: #64748b;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="login-card">
 
-    <h1>CareConnect</h1>
+    <div class="brand-header">
+        <div class="brand-logo">⚕</div>
+        <h1>CareConnect</h1>
+        <p>Electronic Health Record & Clinical System</p>
+    </div>
 
-    <h3>Login</h3>
+    <!-- Role Selection Tabs at Top -->
+    <span class="role-selector-label">Select Login Dashboard</span>
+    <div class="role-tabs">
+        <button type="button" class="role-tab active" data-role="PATIENT" onclick="selectRole('PATIENT')">
+            <span class="icon">🩺</span>
+            <span>Patient</span>
+        </button>
+        <button type="button" class="role-tab" data-role="DOCTOR" onclick="selectRole('DOCTOR')">
+            <span class="icon">👨‍⚕️</span>
+            <span>Doctor</span>
+        </button>
+        <button type="button" class="role-tab" data-role="ADMIN" onclick="selectRole('ADMIN')">
+            <span class="icon">🛡️</span>
+            <span>Admin</span>
+        </button>
+    </div>
 
-    <form action="/login" method="post">
+    <!-- Active Portal Indicator Banner -->
+    <div class="portal-indicator" id="portalIndicator">
+        <span>Logging into:</span>
+        <strong id="portalName">Patient Dashboard</strong>
+    </div>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+    <!-- Alerts -->
+    <div th:if="${param.registered}" class="alert alert-success">
+        <span>✓</span>
+        <div>Account registered successfully! Please sign in below.</div>
+    </div>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
+    <div th:if="${param.error == 'invalid' || (param.error != null && param.error != 'role_mismatch')}" class="alert alert-error">
+        <span>✕</span>
+        <div>Invalid email or password. Please verify your credentials and try again.</div>
+    </div>
 
-        <button type="submit">Login</button>
+    <div th:if="${param.error == 'role_mismatch'}" class="alert alert-error">
+        <span>⚠️</span>
+        <div>
+            <strong>Role Mismatch:</strong> This account does not match the selected <strong th:text="${param.expectedRole}"></strong> portal. Please switch to your correct role above.
+        </div>
+    </div>
+
+    <!-- Login Form -->
+    <form action="/login" method="post" id="loginForm">
+
+        <!-- Hidden input storing selected role -->
+        <input type="hidden" name="role" id="selectedRole" value="PATIENT">
+
+        <div class="form-group">
+            <label for="emailInput">Email Address</label>
+            <div class="input-wrapper">
+                <input type="email" id="emailInput" name="email" placeholder="patient@demo.com" required autocomplete="email">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="passwordInput" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                <button type="button" class="toggle-password" id="togglePasswordBtn" onclick="togglePasswordVisibility()" title="Show/Hide Password">👁</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+            <span>Login to Patient Dashboard</span>
+            <span>→</span>
+        </button>
 
     </form>
 
-    <div class="register">
+    <!-- One-click Demo Credentials Helper -->
+    <div class="demo-section">
+        <span class="demo-label">Quick Test Login (Demo accounts):</span>
+        <div class="demo-chips">
+            <button type="button" class="demo-chip" onclick="fillDemo('PATIENT')">🩺 Patient Demo</button>
+            <button type="button" class="demo-chip" onclick="fillDemo('DOCTOR')">👨‍⚕️ Doctor Demo</button>
+            <button type="button" class="demo-chip" onclick="fillDemo('ADMIN')">🛡️ Admin Demo</button>
+        </div>
+    </div>
+
+    <div class="login-footer">
         Don't have an account?
-        <a href="/register">Register</a>
+        <a href="/register">Create an account</a>
+
+        <a href="/" class="back-home">← Back to Homepage</a>
     </div>
 
 </div>
+
+<script>
+    const roleConfig = {
+        PATIENT: {
+            portalName: "Patient Dashboard",
+            color: "#0284c7",
+            placeholder: "patient@demo.com",
+            btnText: "Login to Patient Dashboard",
+            demoEmail: "patient@demo.com",
+            demoPass: "patient123"
+        },
+        DOCTOR: {
+            portalName: "Doctor Dashboard",
+            color: "#059669",
+            placeholder: "doctor@demo.com",
+            btnText: "Login to Doctor Dashboard",
+            demoEmail: "doctor@demo.com",
+            demoPass: "doctor123"
+        },
+        ADMIN: {
+            portalName: "Admin Dashboard",
+            color: "#7c3aed",
+            placeholder: "admin@careconnect.com",
+            btnText: "Login to Admin Dashboard",
+            demoEmail: "admin@careconnect.com",
+            demoPass: "admin123"
+        }
+    };
+
+    function selectRole(role) {
+        const config = roleConfig[role] || roleConfig.PATIENT;
+
+        // Set hidden form input
+        document.getElementById('selectedRole').value = role;
+
+        // Update tabs styling
+        document.querySelectorAll('.role-tab').forEach(tab => {
+            if (tab.getAttribute('data-role') === role) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        // Update dynamic portal banner
+        const indicator = document.getElementById('portalIndicator');
+        const portalNameEl = document.getElementById('portalName');
+        portalNameEl.textContent = config.portalName;
+        indicator.style.borderLeftColor = config.color;
+
+        // Update email placeholder
+        const emailInput = document.getElementById('emailInput');
+        emailInput.placeholder = config.placeholder;
+
+        // Update submit button
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.style.background = config.color;
+        submitBtn.innerHTML = `<span>${config.btnText}</span> <span>→</span>`;
+    }
+
+    function fillDemo(role) {
+        selectRole(role);
+        const config = roleConfig[role];
+        document.getElementById('emailInput').value = config.demoEmail;
+        document.getElementById('passwordInput').value = config.demoPass;
+    }
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('passwordInput');
+        const btn = document.getElementById('togglePasswordBtn');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            btn.textContent = '🙈';
+        } else {
+            passwordInput.type = 'password';
+            btn.textContent = '👁';
+        }
+    }
+
+    // Auto-select role based on URL parameter (?role=DOCTOR or ?role=ADMIN)
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const roleParam = params.get('role');
+        if (roleParam && roleConfig[roleParam.toUpperCase()]) {
+            selectRole(roleParam.toUpperCase());
+        } else {
+            selectRole('PATIENT');
+        }
+    });
+</script>
 
 </body>
 </html>
