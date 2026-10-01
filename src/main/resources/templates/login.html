@@ -212,6 +212,14 @@
             box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
         }
 
+        .input-wrapper input:-webkit-autofill,
+        .input-wrapper input:-webkit-autofill:hover, 
+        .input-wrapper input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+            -webkit-text-fill-color: #1e293b !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
         .toggle-password {
             position: absolute;
             right: 12px;
@@ -257,43 +265,7 @@
             transform: translateY(0);
         }
 
-        /* Demo Fill Section */
-        .demo-section {
-            margin-top: 22px;
-            padding-top: 18px;
-            border-top: 1px dashed #e2e8f0;
-            text-align: center;
-        }
 
-        .demo-label {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .demo-chips {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .demo-chip {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            color: #475569;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .demo-chip:hover {
-            background: #e2e8f0;
-            color: #0f172a;
-        }
 
         /* Footer Links */
         .login-footer {
@@ -378,7 +350,7 @@
     </div>
 
     <!-- Login Form -->
-    <form action="/login" method="post" id="loginForm">
+    <form action="/login" method="post" id="loginForm" autocomplete="off">
 
         <!-- Hidden input storing selected role -->
         <input type="hidden" name="role" id="selectedRole" value="PATIENT">
@@ -386,14 +358,16 @@
         <div class="form-group">
             <label for="emailInput">Email Address</label>
             <div class="input-wrapper">
-                <input type="email" id="emailInput" name="email" placeholder="patient@demo.com" required autocomplete="email">
+                <input type="email" id="emailInput" name="email" list="savedEmailSuggestions" placeholder="patient@demo.com" required autocomplete="email" autocapitalize="none" spellcheck="false">
+                <datalist id="savedEmailSuggestions">
+                </datalist>
             </div>
         </div>
 
         <div class="form-group">
             <label for="passwordInput">Password</label>
             <div class="input-wrapper">
-                <input type="password" id="passwordInput" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                <input type="password" id="passwordInput" name="password" placeholder="Enter your password" required autocomplete="new-password">
                 <button type="button" class="toggle-password" id="togglePasswordBtn" onclick="togglePasswordVisibility()" title="Show/Hide Password">👁</button>
             </div>
         </div>
@@ -405,19 +379,11 @@
 
     </form>
 
-    <!-- One-click Demo Credentials Helper -->
-    <div class="demo-section">
-        <span class="demo-label">Quick Test Login (Demo accounts):</span>
-        <div class="demo-chips">
-            <button type="button" class="demo-chip" onclick="fillDemo('PATIENT')">🩺 Patient Demo</button>
-            <button type="button" class="demo-chip" onclick="fillDemo('DOCTOR')">👨‍⚕️ Doctor Demo</button>
-            <button type="button" class="demo-chip" onclick="fillDemo('ADMIN')">🛡️ Admin Demo</button>
-        </div>
-    </div>
+
 
     <div class="login-footer">
         Don't have an account?
-        <a href="/register">Create an account</a>
+        <a href="/register" id="createAccountLink">Create an account</a>
 
         <a href="/" class="back-home">← Back to Homepage</a>
     </div>
@@ -481,9 +447,53 @@
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.style.background = config.color;
         submitBtn.innerHTML = `<span>${config.btnText}</span> <span>→</span>`;
+
+        // Update create account link
+        const regLink = document.getElementById('createAccountLink');
+        if (regLink) {
+            regLink.href = '/register?role=' + role;
+        }
+    }
+
+    let isManualOrDemo = false;
+
+    function saveEmailToHistory(email) {
+        if (!email) return;
+        try {
+            let history = JSON.parse(localStorage.getItem('careconnect_saved_emails') || '[]');
+            history = history.filter(item => item.toLowerCase() !== email.toLowerCase());
+            history.unshift(email);
+            if (history.length > 8) history = history.slice(0, 8);
+            localStorage.setItem('careconnect_saved_emails', JSON.stringify(history));
+        } catch (e) {}
+    }
+
+    function loadEmailSuggestions() {
+        try {
+            const datalist = document.getElementById('savedEmailSuggestions');
+            if (!datalist) return;
+            datalist.innerHTML = '';
+            let history = JSON.parse(localStorage.getItem('careconnect_saved_emails') || '[]');
+            history.forEach(email => {
+                const opt = document.createElement('option');
+                opt.value = email;
+                datalist.appendChild(opt);
+            });
+        } catch (e) {}
+    }
+
+    function clearLoginForm() {
+        if (isManualOrDemo) return;
+        const form = document.getElementById('loginForm');
+        if (form) form.reset();
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
     }
 
     function fillDemo(role) {
+        isManualOrDemo = true;
         selectRole(role);
         const config = roleConfig[role];
         document.getElementById('emailInput').value = config.demoEmail;
@@ -502,8 +512,43 @@
         }
     }
 
-    // Auto-select role based on URL parameter (?role=DOCTOR or ?role=ADMIN)
+    // Clear previous details when navigating via back/forward cache or refresh
+    window.addEventListener('pageshow', (event) => {
+        isManualOrDemo = false;
+        clearLoginForm();
+        loadEmailSuggestions();
+    });
+
+    // Auto-select role and clear previous input details on fresh load / refresh
     window.addEventListener('DOMContentLoaded', () => {
+        clearLoginForm();
+        loadEmailSuggestions();
+
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', () => {
+                const emailInput = document.getElementById('emailInput');
+                if (emailInput && emailInput.value.trim()) {
+                    saveEmailToHistory(emailInput.value.trim());
+                }
+            });
+        }
+
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+
+        if (emailInput) {
+            emailInput.addEventListener('input', () => { isManualOrDemo = true; });
+        }
+        if (passwordInput) {
+            passwordInput.addEventListener('input', () => { isManualOrDemo = true; });
+        }
+
+        // Defeat delayed browser autofill attempts on initial page render
+        setTimeout(clearLoginForm, 50);
+        setTimeout(clearLoginForm, 150);
+        setTimeout(clearLoginForm, 300);
+
         const params = new URLSearchParams(window.location.search);
         const roleParam = params.get('role');
         if (roleParam && roleConfig[roleParam.toUpperCase()]) {

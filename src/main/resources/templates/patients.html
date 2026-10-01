@@ -1,137 +1,728 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>Patient Information - CareConnect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Information & Registry - CareConnect</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #faf5ff;
+            --bg-page: linear-gradient(135deg, #f5f3ff 0%, #f8fafc 50%, #eff6ff 100%);
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+        }
+
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
+            background: var(--bg-page);
+            color: var(--slate-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .header {
-            background: #2563eb;
+        /* Top Navigation Header */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--slate-200);
+            padding: 14px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
             color: white;
-            padding: 20px 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
         }
 
-        .header h1 {
+        .brand-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4c1d95;
             margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        .portal-badge {
+            background: #ede9fe;
+            color: #6d28d9;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+        }
+
+        .btn-nav-dashboard {
+            background: #f1f5f9;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav-dashboard:hover {
+            background: #e2e8f0;
+            color: var(--slate-900);
+        }
+
+        .logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #fca5a5;
+            color: #991b1b;
+        }
+
+        /* Container */
         .container {
             max-width: 1200px;
-            margin: 35px auto;
-            padding: 20px;
+            width: 94%;
+            margin: 35px auto 50px;
+            flex: 1;
         }
 
-        h2 {
-            color: #1f2937;
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        .table-container {
-            background: white;
-            padding: 20px;
+        .header-title-box h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title-box p {
+            color: var(--slate-500);
+            font-size: 14.5px;
+            line-height: 1.5;
+            max-width: 680px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary-action:hover {
+            background: linear-gradient(135deg, #6d28d9, #5b21b6);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+        }
+
+        .btn-appts-action {
+            background: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #bae6fd;
+            padding: 9px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-appts-action:hover {
+            background: #f0f9ff;
+            border-color: #7dd3fc;
+        }
+
+        /* Stats Row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon-purple { background: #faf5ff; color: #7c3aed; }
+        .stat-icon-blue { background: #f0f9ff; color: #0284c7; }
+        .stat-icon-green { background: #ecfdf5; color: #059669; }
+        .stat-icon-amber { background: #fffbeb; color: #d97706; }
+
+        .stat-meta .stat-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--slate-900);
+            line-height: 1.1;
+        }
+
+        .stat-meta .stat-title {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 4px;
+        }
+
+        /* Search Bar */
+        .search-filter-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 8px 14px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: #7c3aed;
+            background: #ffffff;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            width: 100%;
+            color: var(--slate-800);
+        }
+
+        /* Table Card */
+        .table-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .table-responsive {
             overflow-x: auto;
+            width: 100%;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-        }
-
-        th {
-            background: #2563eb;
-            color: white;
-            padding: 14px;
             text-align: left;
         }
 
-        td {
-            padding: 13px;
-            border-bottom: 1px solid #ddd;
+        thead {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--slate-200);
         }
 
-        tr:hover {
+        th {
+            padding: 14px 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate-500);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s ease-in-out;
+        }
+
+        tbody tr:hover {
             background: #f8fafc;
         }
 
-        .back {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 11px 20px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            vertical-align: middle;
         }
 
-        .back:hover {
-            background: #1d4ed8;
+        .pill-id {
+            background: #f1f5f9;
+            color: var(--slate-600);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .patient-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .patient-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            color: #6d28d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            border: 1.5px solid #c4b5fd;
+        }
+
+        .patient-name {
+            font-weight: 700;
+            color: var(--slate-900);
+            font-size: 14.5px;
+        }
+
+        .patient-email {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            margin-top: 2px;
+        }
+
+        .role-badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .contact-phone {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--slate-700);
+            font-weight: 500;
+        }
+
+        .status-verified {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .empty-state {
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--slate-500);
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        /* Back Action */
+        .nav-actions {
+            margin-top: 10px;
+        }
+
+        .btn-secondary-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--slate-700);
+            border: 1.5px solid var(--slate-200);
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary-action:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: var(--slate-900);
+        }
+
+        /* Footer */
+        footer {
+            background: #ffffff;
+            border-top: 1px solid var(--slate-200);
+            padding: 18px 35px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-top: auto;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .navbar {
+                padding: 12px 18px;
+            }
+        }
+
+        @media (max-width: 580px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="header">
-    <h1>CareConnect - Patient Information</h1>
-</div>
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+        <a href="/admin-dashboard" class="brand-container">
+            <div class="brand-icon">👥</div>
+            <div class="brand-text">
+                <h2>
+                    <span>CareConnect</span>
+                    <span class="portal-badge">Patient Registry</span>
+                </h2>
+            </div>
+        </a>
 
-<div class="container">
+        <div class="nav-right">
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <span>System Active & Online</span>
+            </div>
 
-    <h2>Registered Patients</h2>
+            <a href="/admin-dashboard" class="btn-nav-dashboard">← Admin Dashboard</a>
 
-    <div class="table-container">
+            <a href="/logout" class="logout-btn">
+                <span>Sign Out</span>
+                <span>↳</span>
+            </a>
+        </div>
+    </header>
 
-        <table>
+    <!-- Main Container -->
+    <main class="container">
 
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Role</th>
-            </tr>
-            </thead>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-title-box">
+                <h1>Registered Patient Registry</h1>
+                <p>Official registry of patient demographics, verified contact channels, and system healthcare identifiers.</p>
+            </div>
 
-            <tbody>
+            <div class="header-actions">
+                <a href="/appointments" class="btn-appts-action">
+                    <span>📅</span>
+                    <span>View Consultations</span>
+                </a>
+                <a href="/register?role=PATIENT" class="btn-primary-action">
+                    <span>+ Register New Patient</span>
+                </a>
+            </div>
+        </div>
 
-            <tr th:each="patient : ${patients}">
+        <!-- Metric Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-purple">👥</div>
+                <div class="stat-meta">
+                    <div class="stat-val" th:text="${totalPatients != null ? totalPatients : #lists.size(patients)}">0</div>
+                    <div class="stat-title">Total Patients</div>
+                </div>
+            </div>
 
-                <td th:text="${patient.id}"></td>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-green">📞</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #059669;" th:text="${phoneCount != null ? phoneCount : #lists.size(patients)}">0</div>
+                    <div class="stat-title">Contact Verified</div>
+                </div>
+            </div>
 
-                <td th:text="${patient.name}"></td>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-blue">🛡️</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #0284c7;">Active</div>
+                    <div class="stat-title">EHR Account Access</div>
+                </div>
+            </div>
 
-                <td th:text="${patient.email}"></td>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-amber">🔒</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #d97706;">HIPAA</div>
+                    <div class="stat-title">Privacy Standard</div>
+                </div>
+            </div>
+        </div>
 
-                <td th:text="${patient.phone != null && !patient.phone.isEmpty() ? patient.phone : 'Not Provided'}"></td>
+        <!-- Search Bar -->
+        <div class="search-filter-card">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="patientSearchInput" placeholder="Search patient by name, email, phone number, or ID..." onkeyup="filterPatientsTable()">
+            </div>
+        </div>
 
-                <td th:text="${patient.role}"></td>
+        <!-- Patients Table Card -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table id="patientsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Patient #</th>
+                            <th>Patient Demographic Profile</th>
+                            <th>Mobile Contact</th>
+                            <th>System Role</th>
+                            <th>Account Status</th>
+                        </tr>
+                    </thead>
 
-            </tr>
+                    <tbody>
+                        <tr th:each="patient : ${patients}">
+                            <td>
+                                <span class="pill-id" th:text="${'#' + patient.id}">#1</span>
+                            </td>
 
-            <tr th:if="${#lists.isEmpty(patients)}">
-                <td colspan="5" style="text-align:center; color:#888; padding:20px;">No registered patients found.</td>
-            </tr>
+                            <td>
+                                <div class="patient-cell">
+                                    <div class="patient-avatar" th:text="${patient.name != null && patient.name.length() > 0 ? patient.name.substring(0, 1).toUpperCase() : 'P'}">P</div>
+                                    <div>
+                                        <div class="patient-name" th:text="${patient.name}">John Doe</div>
+                                        <div class="patient-email" th:text="${patient.email}">patient@demo.com</div>
+                                    </div>
+                                </div>
+                            </td>
 
-            </tbody>
+                            <td>
+                                <span class="contact-phone">
+                                    <span>📱</span>
+                                    <span th:text="${patient.phone != null && !patient.phone.isEmpty() ? patient.phone : 'Not Provided'}">+91 98112 00001</span>
+                                </span>
+                            </td>
 
-        </table>
+                            <td>
+                                <span class="role-badge" th:text="${patient.role != null ? patient.role : 'PATIENT'}">PATIENT</span>
+                            </td>
 
-    </div>
+                            <td>
+                                <span class="status-verified">
+                                    <span>✓</span>
+                                    <span>Active EHR Profile</span>
+                                </span>
+                            </td>
+                        </tr>
 
-    <a href="/admin-dashboard" class="back">
-        ← Back to Admin Dashboard
-    </a>
+                        <tr th:if="${#lists.isEmpty(patients)}" id="noPatientsRow">
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <div class="empty-icon">👥</div>
+                                    <p>No registered patients found in registry.</p>
+                                    <a href="/register?role=PATIENT" class="btn-primary-action" style="margin-top: 12px;">
+                                        + Register First Patient
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-</div>
+        <div class="nav-actions">
+            <a href="/admin-dashboard" class="btn-secondary-action">
+                <span>← Back to Admin Dashboard</span>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 CareConnect Administrative EHR Portal. System Security Level: Administrator. All privileges verified.</p>
+    </footer>
+
+    <!-- Interactive Client Filtering Script -->
+    <script>
+        function filterPatientsTable() {
+            const searchInput = document.getElementById('patientSearchInput').value.toLowerCase();
+            const table = document.getElementById('patientsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.id === 'noPatientsRow') continue;
+
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+    </script>
 
 </body>
 </html>

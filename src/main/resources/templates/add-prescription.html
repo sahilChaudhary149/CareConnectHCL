@@ -120,17 +120,28 @@
 
     <h2>Issue New Prescription</h2>
 
-    <div class="doctor-badge">
-        <span>Prescribing Doctor:</span>
-        <strong th:text="${doctorName}">Doctor</strong>
-    </div>
-
     <form th:action="@{/add-prescription}"
           th:object="${prescription}"
           method="post">
 
-        <!-- Hidden Doctor ID -->
-        <input type="hidden" th:field="*{doctorId}">
+        <!-- When Doctor is logged in -->
+        <div th:if="${isDoctor}" class="doctor-badge">
+            <span>Prescribing Doctor:</span>
+            <strong th:text="${doctorName}">Doctor</strong>
+            <input type="hidden" th:field="*{doctorId}">
+        </div>
+
+        <!-- When Admin is logged in: Select Doctor from dropdown -->
+        <div th:if="${!isDoctor}" class="form-group">
+            <label for="doctorSelect">Prescribing Doctor</label>
+            <select th:field="*{doctorId}" id="doctorSelect" required>
+                <option value="">-- Choose Prescribing Doctor --</option>
+                <option th:each="doc : ${doctors}"
+                        th:value="${doc.id}"
+                        th:text="${doc.name + (doc.specialization != null ? ' (' + doc.specialization + ')' : '')}">
+                </option>
+            </select>
+        </div>
 
         <!-- Select Patient Dropdown -->
         <div class="form-group">

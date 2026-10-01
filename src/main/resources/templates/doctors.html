@@ -1,231 +1,817 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Directory - CareConnect</title>
+    <title>Doctor Directory & Profiles - CareConnect</title>
 
     <style>
-        body {
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background: #f4f7fb;
+            padding: 0;
         }
 
-        .header {
-            background: #2563eb;
-            color: white;
-            padding: 20px 40px;
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --bg-page: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 50%, #eef2ff 100%);
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--slate-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--slate-200);
+            padding: 14px 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header h1 {
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+        }
+
+        .brand-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3a8a;
             margin: 0;
-            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        .portal-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+        }
+
+        .btn-nav-dashboard {
+            background: #f1f5f9;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav-dashboard:hover {
+            background: #e2e8f0;
+            color: var(--slate-900);
+        }
+
+        .logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #fca5a5;
+            color: #991b1b;
+        }
+
+        /* Container */
         .container {
             max-width: 1200px;
-            margin: 35px auto;
-            padding: 0 20px 40px;
+            width: 94%;
+            margin: 35px auto 50px;
+            flex: 1;
         }
 
-        .title-row {
+        /* Page Header */
+        .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 16px;
         }
 
-        h2 {
-            color: #1f2937;
-            margin: 0;
-            font-size: 24px;
+        .header-title-box h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .btn-schedule {
-            display: inline-block;
-            background: #10b981;
+        .header-title-box p {
+            color: var(--slate-500);
+            font-size: 14.5px;
+            line-height: 1.5;
+            max-width: 680px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
-            text-decoration: none;
             padding: 10px 18px;
-            border-radius: 6px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 13.5px;
-            transition: background 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .btn-schedule:hover {
-            background: #059669;
+        .btn-primary-action:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
-        .table-container {
-            background: white;
-            padding: 22px;
+        .btn-schedule-action {
+            background: #ffffff;
+            color: #059669;
+            border: 1.5px solid #a7f3d0;
+            padding: 9px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-schedule-action:hover {
+            background: #ecfdf5;
+            border-color: #6ee7b7;
+        }
+
+        /* Stats Row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon-blue { background: #eff6ff; color: #2563eb; }
+        .stat-icon-green { background: #ecfdf5; color: #059669; }
+        .stat-icon-red { background: #fef2f2; color: #dc2626; }
+        .stat-icon-purple { background: #faf5ff; color: #7c3aed; }
+
+        .stat-meta .stat-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--slate-900);
+            line-height: 1.1;
+        }
+
+        .stat-meta .stat-title {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 4px;
+        }
+
+        /* Filter & Search Bar */
+        .search-filter-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 8px 14px;
+            flex: 1;
+            min-width: 260px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: #2563eb;
+            background: #ffffff;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            width: 100%;
+            color: var(--slate-800);
+        }
+
+        .filter-select {
+            background: #f8fafc;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13.5px;
+            color: var(--slate-700);
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #2563eb;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .table-responsive {
             overflow-x: auto;
+            width: 100%;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--slate-200);
         }
 
         th {
-            background: #2563eb;
-            color: white;
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 14px 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate-500);
         }
 
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-            color: #334155;
-            vertical-align: middle;
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s ease-in-out;
         }
 
-        tr:hover {
+        tbody tr:hover {
             background: #f8fafc;
         }
 
-        .badge {
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .pill-id {
+            background: #f1f5f9;
+            color: var(--slate-600);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12px;
+            font-weight: 700;
             display: inline-block;
+        }
+
+        .doc-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .doc-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            border: 1.5px solid #93c5fd;
+        }
+
+        .doc-name {
+            font-weight: 700;
+            color: var(--slate-900);
+            font-size: 14.5px;
+        }
+
+        .doc-email {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            margin-top: 2px;
+        }
+
+        .spec-pill {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .schedule-info {
+            line-height: 1.4;
+        }
+
+        .schedule-days {
+            font-weight: 600;
+            color: var(--slate-700);
+            font-size: 13px;
+        }
+
+        .schedule-hours {
+            font-size: 12px;
+            color: var(--slate-500);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
         .badge-available {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
         .badge-unavailable {
-            background: #fee2e2;
-            color: #b91c1c;
+            background: #fef2f2;
+            color: #dc2626;
             border: 1px solid #fecaca;
         }
 
-        .link-availability {
+        .btn-action-duty {
             color: #2563eb;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 6px 12px;
+            border-radius: 6px;
             text-decoration: none;
+            font-size: 12.5px;
             font-weight: 600;
-            font-size: 13px;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .link-availability:hover {
-            text-decoration: underline;
-        }
-
-        .back {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 11px 20px;
+        .btn-action-duty:hover {
             background: #2563eb;
             color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
+            border-color: #2563eb;
         }
 
-        .back:hover {
-            background: #1d4ed8;
+        .empty-state {
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--slate-500);
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        /* Back Action */
+        .nav-actions {
+            margin-top: 10px;
+        }
+
+        .btn-secondary-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--slate-700);
+            border: 1.5px solid var(--slate-200);
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary-action:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: var(--slate-900);
+        }
+
+        /* Footer */
+        footer {
+            background: #ffffff;
+            border-top: 1px solid var(--slate-200);
+            padding: 18px 35px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-top: auto;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .navbar {
+                padding: 12px 18px;
+            }
+        }
+
+        @media (max-width: 580px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="header">
-    <h1>CareConnect - Doctor Directory & Profiles</h1>
-    <a href="/logout" style="color: white; text-decoration: none; background: #dc2626; padding: 7px 14px; border-radius: 5px; font-size: 13px;">Logout</a>
-</div>
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+        <a href="/admin-dashboard" class="brand-container">
+            <div class="brand-icon">👨‍⚕️</div>
+            <div class="brand-text">
+                <h2>
+                    <span>CareConnect</span>
+                    <span class="portal-badge">Doctor Directory</span>
+                </h2>
+            </div>
+        </a>
 
-<div class="container">
+        <div class="nav-right">
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <span>System Active & Online</span>
+            </div>
 
-    <div class="title-row">
-        <h2>Registered Medical Specialists</h2>
-        <a href="/admin/availability" class="btn-schedule">🕐 View Availability & Duty Schedule →</a>
-    </div>
+            <a href="/admin-dashboard" class="btn-nav-dashboard">← Admin Dashboard</a>
 
-    <div class="table-container">
+            <a href="/logout" class="logout-btn">
+                <span>Sign Out</span>
+                <span>↳</span>
+            </a>
+        </div>
+    </header>
 
-        <table>
+    <!-- Main Container -->
+    <main class="container">
 
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Doctor Name</th>
-                <th>Email Address</th>
-                <th>Department / Specialization</th>
-                <th>Contact Phone</th>
-                <th>Status</th>
-                <th>Schedule</th>
-            </tr>
-            </thead>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-title-box">
+                <h1>Medical Specialist Directory</h1>
+                <p>Comprehensive roster of hospital physicians, department specializations, clinic duty schedules, and on-duty availability.</p>
+            </div>
 
-            <tbody>
+            <div class="header-actions">
+                <a href="/admin/availability" class="btn-schedule-action">
+                    <span>⏱️</span>
+                    <span>Manage Duty Roster</span>
+                </a>
+                <a href="/register?role=DOCTOR" class="btn-primary-action">
+                    <span>+ Register New Doctor</span>
+                </a>
+            </div>
+        </div>
 
-            <tr th:each="doctor : ${doctors}">
+        <!-- Metric Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-blue">👨‍⚕️</div>
+                <div class="stat-meta">
+                    <div class="stat-val" th:text="${totalDoctors != null ? totalDoctors : #lists.size(doctors)}">0</div>
+                    <div class="stat-title">Total Specialists</div>
+                </div>
+            </div>
 
-                <td th:text="${doctor.id}"></td>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-green">🟢</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #059669;" th:text="${availableCount != null ? availableCount : 0}">0</div>
+                    <div class="stat-title">On Duty (Available)</div>
+                </div>
+            </div>
 
-                <td>
-                    <strong th:text="${doctor.name}"></strong>
-                </td>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-red">🔴</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #dc2626;" th:text="${unavailableCount != null ? unavailableCount : 0}">0</div>
+                    <div class="stat-title">Off Duty (Unavailable)</div>
+                </div>
+            </div>
 
-                <td th:text="${doctor.email}"></td>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-purple">🩺</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #7c3aed;" th:text="${specCount != null ? specCount : 'Multi'}">0</div>
+                    <div class="stat-title">Departments Active</div>
+                </div>
+            </div>
+        </div>
 
-                <td>
-                    <span th:text="${doctor.specialization != null && !doctor.specialization.isEmpty() ? doctor.specialization : 'General Medicine'}" style="font-weight: 500;"></span>
-                </td>
+        <!-- Search & Filter Controls -->
+        <div class="search-filter-card">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="doctorSearchInput" placeholder="Search doctor by name, email, or department..." onkeyup="filterDoctorsTable()">
+            </div>
+            <div>
+                <select id="statusFilterSelect" class="filter-select" onchange="filterDoctorsTable()">
+                    <option value="ALL">All Statuses</option>
+                    <option value="AVAILABLE">On Duty (Available)</option>
+                    <option value="UNAVAILABLE">Off Duty (Unavailable)</option>
+                </select>
+            </div>
+        </div>
 
-                <td th:text="${doctor.phone != null && !doctor.phone.isEmpty() ? doctor.phone : 'Not Provided'}"></td>
+        <!-- Doctors Table Card -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table id="doctorsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Doctor & Credentials</th>
+                            <th>Clinical Department</th>
+                            <th>Contact Phone</th>
+                            <th>Clinic Schedule</th>
+                            <th>Duty Status</th>
+                            <th style="width: 140px;">Operations</th>
+                        </tr>
+                    </thead>
 
-                <td>
-                    <span th:if="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-available">
-                        ● AVAILABLE
-                    </span>
-                    <span th:unless="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-unavailable">
-                        ● UNAVAILABLE
-                    </span>
-                </td>
+                    <tbody>
+                        <tr th:each="doctor : ${doctors}">
+                            <td>
+                                <span class="pill-id" th:text="${'#' + doctor.id}">#1</span>
+                            </td>
 
-                <td>
-                    <a href="/admin/availability" class="link-availability">
-                        Manage Duty →
-                    </a>
-                </td>
+                            <td>
+                                <div class="doc-cell">
+                                    <div class="doc-avatar" th:text="${doctor.name != null && doctor.name.length() > 3 ? doctor.name.substring(0, 1).toUpperCase() : 'Dr'}">D</div>
+                                    <div>
+                                        <div class="doc-name" th:text="${doctor.name}">Dr. Sarah Smith</div>
+                                        <div class="doc-email" th:text="${doctor.email}">doctor@demo.com</div>
+                                    </div>
+                                </div>
+                            </td>
 
-            </tr>
+                            <td>
+                                <span class="spec-pill">
+                                    <span>🩺</span>
+                                    <span th:text="${doctor.specialization != null && !doctor.specialization.isEmpty() ? doctor.specialization : 'General Medicine'}">Cardiology</span>
+                                </span>
+                            </td>
 
-            <tr th:if="${#lists.isEmpty(doctors)}">
-                <td colspan="7" style="text-align: center; color: #888; padding: 25px;">No registered doctors found.</td>
-            </tr>
+                            <td>
+                                <span style="color: var(--slate-600); font-weight: 500;" th:text="${doctor.phone != null && !doctor.phone.isEmpty() ? doctor.phone : 'Not Provided'}">+91 98765 01001</span>
+                            </td>
 
-            </tbody>
+                            <td>
+                                <div class="schedule-info">
+                                    <div class="schedule-days" th:text="${doctor.availableDays != null && !doctor.availableDays.isEmpty() ? doctor.availableDays : 'Mon - Fri'}">Mon - Fri</div>
+                                    <div class="schedule-hours" th:text="${doctor.availableTime != null && !doctor.availableTime.isEmpty() ? doctor.availableTime : '09:00 AM - 05:00 PM'}">09:00 AM - 05:00 PM</div>
+                                </div>
+                            </td>
 
-        </table>
+                            <td>
+                                <span th:if="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-available">
+                                    ● AVAILABLE
+                                </span>
+                                <span th:unless="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-unavailable">
+                                    ● UNAVAILABLE
+                                </span>
+                            </td>
 
-    </div>
+                            <td>
+                                <a href="/admin/availability" class="btn-action-duty" title="Configure shift hours and availability">
+                                    <span>Duty Settings</span>
+                                    <span>→</span>
+                                </a>
+                            </td>
+                        </tr>
 
-    <a href="/admin-dashboard" class="back">
-        ← Back to Admin Dashboard
-    </a>
+                        <tr th:if="${#lists.isEmpty(doctors)}" id="noDoctorsRow">
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <div class="empty-icon">👨‍⚕️</div>
+                                    <p>No registered physicians found in directory.</p>
+                                    <a href="/register?role=DOCTOR" class="btn-primary-action" style="margin-top: 12px;">
+                                        + Register First Doctor
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-</div>
+        <div class="nav-actions">
+            <a href="/admin-dashboard" class="btn-secondary-action">
+                <span>← Back to Admin Dashboard</span>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 CareConnect Administrative EHR Portal. System Security Level: Administrator. All privileges verified.</p>
+    </footer>
+
+    <!-- Interactive Client Filtering Script -->
+    <script>
+        function filterDoctorsTable() {
+            const searchInput = document.getElementById('doctorSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilterSelect').value.toUpperCase();
+            const table = document.getElementById('doctorsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.id === 'noDoctorsRow') continue;
+
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(searchInput);
+
+                let matchesStatus = true;
+                if (statusFilter !== 'ALL') {
+                    matchesStatus = text.includes(statusFilter.toLowerCase());
+                }
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+    </script>
 
 </body>
 </html>

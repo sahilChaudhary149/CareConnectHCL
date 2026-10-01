@@ -1,126 +1,465 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Availability - CareConnect</title>
+    <title>Doctor Availability & Duty Schedule - CareConnect</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #ecfdf5;
+            --bg-page: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 50%, #eff6ff 100%);
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+        }
+
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background: #f4f7fb;
+            background: var(--bg-page);
+            color: var(--slate-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .header {
-            background: #2563eb;
-            color: white;
-            padding: 20px 40px;
+        /* Top Navigation Header */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--slate-200);
+            padding: 14px 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 35px auto;
-            padding: 0 20px 40px;
-        }
-
-        .title-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        h2 {
-            color: #1f2937;
-            margin: 0;
-            font-size: 24px;
-        }
-
-        /* Stat Badges */
-        .stats-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 16px 22px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        .brand-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            flex: 1;
-            min-width: 180px;
+            text-decoration: none;
         }
 
-        .stat-icon {
-            font-size: 28px;
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
         }
 
-        .stat-info .num {
-            font-size: 22px;
+        .brand-text h2 {
+            font-size: 20px;
             font-weight: 700;
-            color: #1f2937;
+            color: #064e3b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .stat-info .label {
-            font-size: 13px;
-            color: #64748b;
+        .portal-badge {
+            background: #d1fae5;
+            color: #047857;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
-        /* Table Styling */
-        .table-container {
-            background: white;
-            padding: 22px;
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+        }
+
+        .btn-nav-dashboard {
+            background: #f1f5f9;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav-dashboard:hover {
+            background: #e2e8f0;
+            color: var(--slate-900);
+        }
+
+        .logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #fca5a5;
+            color: #991b1b;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            width: 94%;
+            margin: 35px auto 50px;
+            flex: 1;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title-box h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title-box p {
+            color: var(--slate-500);
+            font-size: 14.5px;
+            line-height: 1.5;
+            max-width: 680px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-dir-action {
+            background: #ffffff;
+            color: #2563eb;
+            border: 1.5px solid #bfdbfe;
+            padding: 9px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-dir-action:hover {
+            background: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        /* Alert message */
+        .alert-success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 14px 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.08);
+        }
+
+        /* Stats Row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon-blue { background: #eff6ff; color: #2563eb; }
+        .stat-icon-green { background: #ecfdf5; color: #059669; }
+        .stat-icon-red { background: #fef2f2; color: #dc2626; }
+
+        .stat-meta .stat-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--slate-900);
+            line-height: 1.1;
+        }
+
+        .stat-meta .stat-title {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 4px;
+        }
+
+        /* Search & Filter Bar */
+        .search-filter-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 8px 14px;
+            flex: 1;
+            min-width: 260px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: #059669;
+            background: #ffffff;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            width: 100%;
+            color: var(--slate-800);
+        }
+
+        .filter-select {
+            background: #f8fafc;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13.5px;
+            color: var(--slate-700);
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #059669;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .table-responsive {
             overflow-x: auto;
+            width: 100%;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--slate-200);
         }
 
         th {
-            background: #2563eb;
-            color: white;
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 14px 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate-500);
         }
 
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-            color: #334155;
-            vertical-align: middle;
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s ease-in-out;
         }
 
-        tr:hover {
+        tbody tr:hover {
             background: #f8fafc;
         }
 
-        /* Badges */
-        .badge {
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .pill-id {
+            background: #f1f5f9;
+            color: var(--slate-600);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12px;
+            font-weight: 700;
             display: inline-block;
+        }
+
+        .doc-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .doc-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #047857;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            border: 1.5px solid #6ee7b7;
+        }
+
+        .doc-name {
+            font-weight: 700;
+            color: var(--slate-900);
+            font-size: 14.5px;
+        }
+
+        .doc-email {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            margin-top: 2px;
+        }
+
+        .spec-pill {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -129,347 +468,509 @@
         }
 
         .badge-available {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
         .badge-unavailable {
-            background: #fee2e2;
-            color: #b91c1c;
+            background: #fef2f2;
+            color: #dc2626;
             border: 1px solid #fecaca;
         }
 
         /* Action Buttons */
+        .actions-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .btn-toggle {
-            display: inline-block;
-            padding: 7px 14px;
+            padding: 6px 12px;
             font-size: 12.5px;
             font-weight: 600;
             border-radius: 6px;
             text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-toggle-on {
-            background: #16a34a;
-            color: white;
-        }
-
-        .btn-toggle-on:hover {
-            background: #15803d;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .btn-toggle-off {
-            background: #dc2626;
-            color: white;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
         }
 
         .btn-toggle-off:hover {
-            background: #b91c1c;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-toggle-on {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .btn-toggle-on:hover {
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .btn-edit {
-            background: #f1f5f9;
-            color: #334155;
-            border: 1px solid #cbd5e1;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
             padding: 6px 12px;
             border-radius: 6px;
-            cursor: pointer;
             font-size: 12.5px;
-            font-weight: 500;
-            margin-left: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .btn-edit:hover {
-            background: #e2e8f0;
-        }
-
-        .actions-cell {
-            white-space: nowrap;
-        }
-
-        .back {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 11px 20px;
             background: #2563eb;
             color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
+            border-color: #2563eb;
         }
 
-        .back:hover {
-            background: #1d4ed8;
+        /* Back Action */
+        .nav-actions {
+            margin-top: 10px;
         }
 
-        .alert-success {
-            background: #dcfce7;
-            color: #15803d;
-            padding: 12px 18px;
+        .btn-secondary-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--slate-700);
+            border: 1.5px solid var(--slate-200);
+            padding: 10px 18px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #bbf7d0;
+            text-decoration: none;
+            font-weight: 600;
             font-size: 14px;
+            transition: all 0.2s;
         }
 
-        /* Edit Modal */
+        .btn-secondary-action:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: var(--slate-900);
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
         }
 
         .modal-content {
             background: white;
-            padding: 28px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 30px;
+            border-radius: 16px;
+            width: 92%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .modal-content h3 {
-            margin-top: 0;
-            color: #1f2937;
+            margin: 0 0 4px;
+            font-size: 19px;
+            color: var(--slate-900);
+            font-weight: 700;
         }
 
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 13px;
+            margin-bottom: 6px;
+            font-size: 13.5px;
             font-weight: 600;
-            color: #475569;
+            color: var(--slate-700);
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 9px 12px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 6px;
-            box-sizing: border-box;
+            padding: 10px 14px;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
             font-size: 14px;
+            color: var(--slate-800);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #059669;
         }
 
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 24px;
         }
 
         .btn-cancel {
             background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 8px 16px;
-            border-radius: 6px;
+            border: 1px solid var(--slate-200);
+            color: var(--slate-700);
+            padding: 9px 18px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 13.5px;
         }
 
         .btn-save {
-            background: #2563eb;
+            background: linear-gradient(135deg, #059669, #047857);
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 6px;
+            padding: 9px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 13.5px;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+        }
+
+        /* Footer */
+        footer {
+            background: #ffffff;
+            border-top: 1px solid var(--slate-200);
+            padding: 18px 35px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-top: auto;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                padding: 12px 18px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="header">
-    <h1>CareConnect - Doctor Availability & Duty Schedule</h1>
-    <a href="/logout" style="color: white; text-decoration: none; background: #dc2626; padding: 7px 14px; border-radius: 5px; font-size: 13px;">Logout</a>
-</div>
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+        <a href="/admin-dashboard" class="brand-container">
+            <div class="brand-icon">⏱️</div>
+            <div class="brand-text">
+                <h2>
+                    <span>CareConnect</span>
+                    <span class="portal-badge">Duty Roster</span>
+                </h2>
+            </div>
+        </a>
 
-<div class="container">
+        <div class="nav-right">
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <span>System Active & Online</span>
+            </div>
 
-    <div class="title-bar">
-        <h2>Schedule & On-Duty Status</h2>
-    </div>
+            <a href="/admin-dashboard" class="btn-nav-dashboard">← Admin Dashboard</a>
 
-    <!-- Alert -->
-    <div th:if="${param.saved}" class="alert-success">
-        ✓ Doctor schedule & availability updated successfully!
-    </div>
+            <a href="/logout" class="logout-btn">
+                <span>Sign Out</span>
+                <span>↳</span>
+            </a>
+        </div>
+    </header>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <span class="stat-icon">👨‍⚕️</span>
-            <div class="stat-info">
-                <div class="num" th:text="${totalDoctors}">0</div>
-                <div class="label">Total Doctors</div>
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-title-box">
+                <h1>Doctor Availability & Duty Schedule</h1>
+                <p>Manage physician consultation shifts, update working days, and configure active on-duty status in real time.</p>
+            </div>
+
+            <div class="header-actions">
+                <a href="/admin/doctors" class="btn-dir-action">
+                    <span>👨‍⚕️</span>
+                    <span>View Specialist Directory</span>
+                </a>
             </div>
         </div>
 
-        <div class="stat-card">
-            <span class="stat-icon">🟢</span>
-            <div class="stat-info">
-                <div class="num" th:text="${availableCount}" style="color: #16a34a;">0</div>
-                <div class="label">On Duty (Available)</div>
+        <!-- Saved Notification Alert -->
+        <div th:if="${param.saved}" class="alert-success">
+            <span>✅</span>
+            <span>Doctor schedule, clinic hours, and availability status updated successfully!</span>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-blue">👨‍⚕️</div>
+                <div class="stat-meta">
+                    <div class="stat-val" th:text="${totalDoctors}">0</div>
+                    <div class="stat-title">Total Doctors</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-green">🟢</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #059669;" th:text="${availableCount}">0</div>
+                    <div class="stat-title">On Duty (Available)</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-red">🔴</div>
+                <div class="stat-meta">
+                    <div class="stat-val" style="color: #dc2626;" th:text="${unavailableCount}">0</div>
+                    <div class="stat-title">Off Duty (Unavailable)</div>
+                </div>
             </div>
         </div>
 
-        <div class="stat-card">
-            <span class="stat-icon">🔴</span>
-            <div class="stat-info">
-                <div class="num" th:text="${unavailableCount}" style="color: #dc2626;">0</div>
-                <div class="label">Off Duty (Unavailable)</div>
+        <!-- Search & Filter Controls -->
+        <div class="search-filter-card">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="availabilitySearchInput" placeholder="Filter doctor schedule by name, email, or department..." onkeyup="filterAvailabilityTable()">
             </div>
-        </div>
-    </div>
-
-    <!-- Availability Table -->
-    <div class="table-container">
-
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Doctor</th>
-                <th>Specialization</th>
-                <th>Available Days</th>
-                <th>Shift Hours</th>
-                <th>Duty Status</th>
-                <th>Quick Actions</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="doctor : ${doctors}">
-                <td th:text="${doctor.id}"></td>
-                <td>
-                    <strong th:text="${doctor.name}"></strong><br>
-                    <small style="color: #64748b;" th:text="${doctor.email}"></small>
-                </td>
-                <td th:text="${doctor.specialization != null && !doctor.specialization.isEmpty() ? doctor.specialization : 'General'}"></td>
-                <td th:text="${doctor.availableDays != null && !doctor.availableDays.isEmpty() ? doctor.availableDays : 'Not Scheduled'}"></td>
-                <td th:text="${doctor.availableTime != null && !doctor.availableTime.isEmpty() ? doctor.availableTime : 'Not Scheduled'}"></td>
-
-                <td>
-                    <span th:if="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-available">
-                        ● AVAILABLE
-                    </span>
-                    <span th:unless="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-unavailable">
-                        ● UNAVAILABLE
-                    </span>
-                </td>
-
-                <td class="actions-cell">
-                    <!-- Toggle Status Button -->
-                    <a th:if="${doctor.availabilityStatus == 'AVAILABLE'}"
-                       th:href="@{/admin/availability/toggle/{id}(id=${doctor.id})}"
-                       class="btn-toggle btn-toggle-off"
-                       title="Click to mark Off Duty">
-                        Set Off Duty
-                    </a>
-
-                    <a th:unless="${doctor.availabilityStatus == 'AVAILABLE'}"
-                       th:href="@{/admin/availability/toggle/{id}(id=${doctor.id})}"
-                       class="btn-toggle btn-toggle-on"
-                       title="Click to mark On Duty">
-                        Set On Duty
-                    </a>
-
-                    <!-- Edit Schedule Button -->
-                    <button type="button" class="btn-edit"
-                            th:attr="data-id=${doctor.id},
-                                     data-name=${doctor.name},
-                                     data-days=${doctor.availableDays},
-                                     data-time=${doctor.availableTime},
-                                     data-status=${doctor.availabilityStatus}"
-                            onclick="openEditModal(this)">
-                        ✏ Edit Hours
-                    </button>
-                </td>
-            </tr>
-
-            <tr th:if="${#lists.isEmpty(doctors)}">
-                <td colspan="7" style="text-align: center; color: #888; padding: 25px;">No registered doctors found.</td>
-            </tr>
-            </tbody>
-        </table>
-
-    </div>
-
-    <a href="/admin-dashboard" class="back">
-        ← Back to Admin Dashboard
-    </a>
-
-</div>
-
-<!-- Schedule Edit Modal -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <h3>Edit Doctor Schedule</h3>
-        <p id="modalDoctorName" style="color: #64748b; font-size: 14px; margin-top: -5px; margin-bottom: 18px;"></p>
-
-        <form action="/admin/availability/update" method="post">
-            <input type="hidden" name="doctorId" id="modalDoctorId">
-
-            <div class="form-group">
-                <label>Available Days</label>
-                <input type="text" name="availableDays" id="modalDays" placeholder="e.g. Mon - Fri" required>
-            </div>
-
-            <div class="form-group">
-                <label>Shift / Available Hours</label>
-                <input type="text" name="availableTime" id="modalTime" placeholder="e.g. 09:00 AM - 05:00 PM" required>
-            </div>
-
-            <div class="form-group">
-                <label>Duty Status</label>
-                <select name="availabilityStatus" id="modalStatus" required>
-                    <option value="AVAILABLE">AVAILABLE (On Duty)</option>
-                    <option value="UNAVAILABLE">UNAVAILABLE (Off Duty)</option>
+            <div>
+                <select id="availStatusFilterSelect" class="filter-select" onchange="filterAvailabilityTable()">
+                    <option value="ALL">All Duty Statuses</option>
+                    <option value="AVAILABLE">On Duty Only</option>
+                    <option value="UNAVAILABLE">Off Duty Only</option>
                 </select>
             </div>
+        </div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-                <button type="submit" class="btn-save">Save Changes</button>
+        <!-- Availability Table Card -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table id="availabilityTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Doctor & Credentials</th>
+                            <th>Clinical Department</th>
+                            <th>Scheduled Days</th>
+                            <th>Shift Timings</th>
+                            <th>Duty Status</th>
+                            <th style="width: 230px;">Quick Controls</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="doctor : ${doctors}">
+                            <td>
+                                <span class="pill-id" th:text="${'#' + doctor.id}">#1</span>
+                            </td>
+
+                            <td>
+                                <div class="doc-cell">
+                                    <div class="doc-avatar" th:text="${doctor.name != null && doctor.name.length() > 3 ? doctor.name.substring(0, 1).toUpperCase() : 'D'}">D</div>
+                                    <div>
+                                        <div class="doc-name" th:text="${doctor.name}">Dr. Sarah Smith</div>
+                                        <div class="doc-email" th:text="${doctor.email}">doctor@demo.com</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="spec-pill">
+                                    <span>🩺</span>
+                                    <span th:text="${doctor.specialization != null && !doctor.specialization.isEmpty() ? doctor.specialization : 'General Medicine'}">Cardiology</span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <strong style="color: var(--slate-700);" th:text="${doctor.availableDays != null && !doctor.availableDays.isEmpty() ? doctor.availableDays : 'Not Scheduled'}">Mon - Fri</strong>
+                            </td>
+
+                            <td>
+                                <span style="color: var(--slate-600);" th:text="${doctor.availableTime != null && !doctor.availableTime.isEmpty() ? doctor.availableTime : 'Not Scheduled'}">09:00 AM - 05:00 PM</span>
+                            </td>
+
+                            <td>
+                                <span th:if="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-available">
+                                    ● AVAILABLE
+                                </span>
+                                <span th:unless="${doctor.availabilityStatus == 'AVAILABLE'}" class="badge badge-unavailable">
+                                    ● UNAVAILABLE
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="actions-group">
+                                    <a th:if="${doctor.availabilityStatus == 'AVAILABLE'}"
+                                       th:href="@{/admin/availability/toggle/{id}(id=${doctor.id})}"
+                                       class="btn-toggle btn-toggle-off"
+                                       title="Click to toggle status to Off Duty">
+                                        <span>Off Duty</span>
+                                    </a>
+
+                                    <a th:unless="${doctor.availabilityStatus == 'AVAILABLE'}"
+                                       th:href="@{/admin/availability/toggle/{id}(id=${doctor.id})}"
+                                       class="btn-toggle btn-toggle-on"
+                                       title="Click to toggle status to On Duty">
+                                        <span>On Duty</span>
+                                    </a>
+
+                                    <button type="button" class="btn-edit"
+                                            th:attr="data-id=${doctor.id},
+                                                     data-name=${doctor.name},
+                                                     data-days=${doctor.availableDays},
+                                                     data-time=${doctor.availableTime},
+                                                     data-status=${doctor.availabilityStatus}"
+                                            onclick="openEditModal(this)">
+                                        <span>✏</span>
+                                        <span>Edit</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(doctors)}" id="noAvailRow">
+                            <td colspan="7" style="text-align: center; color: #888; padding: 35px;">
+                                No registered doctors found in roster.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </form>
+        </div>
+
+        <div class="nav-actions">
+            <a href="/admin-dashboard" class="btn-secondary-action">
+                <span>← Back to Admin Dashboard</span>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Schedule Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3>Edit Doctor Clinic Hours</h3>
+            <p id="modalDoctorName" style="color: #64748b; font-size: 13.5px; margin-top: 4px; margin-bottom: 20px;"></p>
+
+            <form action="/admin/availability/update" method="post">
+                <input type="hidden" name="doctorId" id="modalDoctorId">
+
+                <div class="form-group">
+                    <label>Available Working Days</label>
+                    <input type="text" name="availableDays" id="modalDays" placeholder="e.g. Mon - Fri, Mon - Sat" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Clinic Shift Hours</label>
+                    <input type="text" name="availableTime" id="modalTime" placeholder="e.g. 09:00 AM - 05:00 PM" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Clinical Duty Status</label>
+                    <select name="availabilityStatus" id="modalStatus" required>
+                        <option value="AVAILABLE">AVAILABLE (On Duty)</option>
+                        <option value="UNAVAILABLE">UNAVAILABLE (Off Duty)</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Duty Schedule</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<script>
-    function openEditModal(btn) {
-        document.getElementById('modalDoctorId').value = btn.getAttribute('data-id');
-        document.getElementById('modalDoctorName').textContent = 'Updating schedule for ' + btn.getAttribute('data-name');
-        document.getElementById('modalDays').value = btn.getAttribute('data-days') || 'Mon - Fri';
-        document.getElementById('modalTime').value = btn.getAttribute('data-time') || '09:00 AM - 05:00 PM';
-        document.getElementById('modalStatus').value = btn.getAttribute('data-status') || 'AVAILABLE';
-        document.getElementById('editModal').style.display = 'flex';
-    }
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 CareConnect Administrative EHR Portal. System Security Level: Administrator. All privileges verified.</p>
+    </footer>
 
-    function closeEditModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    // Close modal if clicked outside
-    window.onclick = function(e) {
-        const modal = document.getElementById('editModal');
-        if (e.target === modal) {
-            closeEditModal();
+    <!-- Interactive Client Filtering Script -->
+    <script>
+        function openEditModal(btn) {
+            document.getElementById('modalDoctorId').value = btn.getAttribute('data-id');
+            document.getElementById('modalDoctorName').textContent = 'Configuring duty schedule for ' + btn.getAttribute('data-name');
+            document.getElementById('modalDays').value = btn.getAttribute('data-days') || 'Mon - Fri';
+            document.getElementById('modalTime').value = btn.getAttribute('data-time') || '09:00 AM - 05:00 PM';
+            document.getElementById('modalStatus').value = btn.getAttribute('data-status') || 'AVAILABLE';
+            document.getElementById('editModal').style.display = 'flex';
         }
-    };
-</script>
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        window.onclick = function(e) {
+            const modal = document.getElementById('editModal');
+            if (e.target === modal) {
+                closeEditModal();
+            }
+        };
+
+        function filterAvailabilityTable() {
+            const searchInput = document.getElementById('availabilitySearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('availStatusFilterSelect').value.toUpperCase();
+            const table = document.getElementById('availabilityTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.id === 'noAvailRow') continue;
+
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(searchInput);
+
+                let matchesStatus = true;
+                if (statusFilter !== 'ALL') {
+                    matchesStatus = text.includes(statusFilter.toLowerCase());
+                }
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+    </script>
 
 </body>
 </html>

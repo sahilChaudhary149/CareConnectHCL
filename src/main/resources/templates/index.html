@@ -1,199 +1,676 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareConnect - Electronic Health Record</title>
+    <title>CareConnect - Patient-Provider Electronic Health Record</title>
 
     <style>
         * {
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #1976d2;
+            --primary-dark: #0d47a1;
+            --primary-hover: #1565c0;
+            --bg-gradient: linear-gradient(135deg, #eef5fc 0%, #f7fafc 50%, #e8f1fb 100%);
+            --patient-color: #0284c7;
+            --doctor-color: #059669;
+            --admin-color: #7c3aed;
+            --slate-800: #1e293b;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
         }
 
         body {
-            background: linear-gradient(135deg, #e8f0fe 0%, #f4f8fb 100%);
-            margin: 0;
-            padding: 40px 20px;
+            background: var(--bg-gradient);
+            color: var(--slate-800);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1976d2, #0d47a1);
+            color: white;
+            font-size: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.25);
         }
 
-        .container {
-            width: 100%;
-            max-width: 650px;
-            text-align: center;
-            background: white;
-            padding: 45px 35px;
-            border-radius: 18px;
-            box-shadow: 0 12px 35px rgba(25, 118, 210, 0.12);
-            border: 1px solid #e1e8f0;
+        .brand-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: -0.4px;
         }
 
         .brand-badge {
-            display: inline-flex;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .nav-actions {
+            display: flex;
             align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            background: #e3f2fd;
-            color: #1976d2;
-            border-radius: 50%;
-            font-size: 32px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.15);
-        }
-
-        h1 {
-            color: #0d47a1;
-            font-size: 36px;
-            margin: 0 0 8px;
-            font-weight: 700;
-        }
-
-        h2 {
-            color: #475569;
-            font-size: 20px;
-            font-weight: 500;
-            margin: 0 0 16px;
-        }
-
-        p {
-            color: #64748b;
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 0 auto 30px;
-            max-width: 520px;
-        }
-
-        .role-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin-bottom: 25px;
         }
 
-        .role-btn {
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 18px 10px;
-            text-decoration: none;
-            color: #334155;
-            transition: all 0.2s ease-in-out;
+        .system-status {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 12.5px;
+            color: #059669;
+            background: #ecfdf5;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #a7f3d0;
+            font-weight: 500;
+            margin-right: 8px;
         }
 
-        .role-btn .icon {
-            font-size: 26px;
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
         }
 
-        .role-btn .title {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .role-btn:hover {
-            border-color: #1976d2;
-            background: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(25, 118, 210, 0.12);
-            color: #0d47a1;
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .btn-primary {
-            background: #1976d2;
+        .btn-nav-login {
+            background: var(--primary);
             color: white;
-            padding: 12px 28px;
-            text-decoration: none;
+            padding: 9px 18px;
             border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 15px;
             transition: all 0.2s;
-            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.2);
+            box-shadow: 0 2px 6px rgba(25, 118, 210, 0.25);
         }
 
-        .btn-primary:hover {
-            background: #1565c0;
+        .btn-nav-login:hover {
+            background: var(--primary-hover);
             transform: translateY(-1px);
         }
 
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #334155;
-            padding: 12px 28px;
-            text-decoration: none;
+        .btn-nav-register {
+            background: #ffffff;
+            color: var(--slate-600);
+            border: 1px solid var(--slate-200);
+            padding: 8px 16px;
             border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 15px;
-            border: 1px solid #cbd5e1;
             transition: all 0.2s;
         }
 
-        .btn-secondary:hover {
-            background: #e2e8f0;
+        .btn-nav-register:hover {
+            background: var(--slate-100);
+            color: var(--slate-800);
+        }
+
+        /* Main Content Container */
+        .main-wrapper {
+            flex: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 50px 24px 60px;
+            width: 100%;
+        }
+
+        /* Hero Banner */
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(3, 105, 161, 0.08);
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: #0a2540;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #1976d2 0%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            font-size: 17px;
+            color: var(--slate-500);
+            max-width: 640px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        /* Primary Action Buttons */
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cta-primary {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: #ffffff;
+            padding: 14px 34px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-cta-secondary {
+            background: #ffffff;
+            color: var(--slate-800);
+            border: 1.5px solid var(--slate-200);
+            padding: 13px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-cta-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+
+        /* Section Title */
+        .section-header {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 28px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            font-size: 14.5px;
+            color: var(--slate-500);
+        }
+
+        /* Supported Portals Informational Cards (Non-Clickable Text) */
+        .portals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin-bottom: 45px;
+        }
+
+        .portal-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 16px;
+            padding: 26px 22px;
+            box-shadow: 0 8px 24px rgba(25, 118, 210, 0.06);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+            user-select: none;
+            transition: border-color 0.2s;
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .portal-card.patient::before { background: var(--patient-color); }
+        .portal-card.doctor::before { background: var(--doctor-color); }
+        .portal-card.admin::before { background: var(--admin-color); }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .card-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .portal-card.patient .card-icon { background: #f0f9ff; }
+        .portal-card.doctor .card-icon { background: #f0fdf4; }
+        .portal-card.admin .card-icon { background: #faf5ff; }
+
+        .card-tag {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .portal-card.patient .card-tag { background: #e0f2fe; color: #0284c7; }
+        .portal-card.doctor .card-tag { background: #dcfce7; color: #15803d; }
+        .portal-card.admin .card-tag { background: #f3e8ff; color: #7c3aed; }
+
+        .portal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--slate-800);
+            margin-bottom: 8px;
+        }
+
+        .portal-desc {
+            font-size: 13.5px;
+            color: var(--slate-500);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin-top: auto;
+            border-top: 1px dashed var(--slate-200);
+            padding-top: 14px;
+        }
+
+        .feature-list li {
+            font-size: 12.5px;
+            color: var(--slate-600);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .feature-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .feature-bullet {
+            font-size: 13px;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* Feature Highlights Bar */
+        .highlights-strip {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .highlight-item h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--slate-800);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .highlight-item p {
+            font-size: 12.5px;
+            color: var(--slate-500);
+            line-height: 1.4;
+        }
+
+        /* Bottom Quick Action Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #0d47a1, #1976d2);
+            border-radius: 16px;
+            padding: 32px 36px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(25, 118, 210, 0.25);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .cta-banner h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .cta-banner p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .cta-banner-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: var(--primary-dark);
+            padding: 10px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-white:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .btn-banner-alt {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-banner-alt:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Footer */
+        footer {
+            background: #ffffff;
+            border-top: 1px solid var(--slate-200);
+            padding: 20px 32px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-top: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .portals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .highlights-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .cta-banner {
+                text-align: center;
+                justify-content: center;
+            }
+
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .system-status {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .highlights-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .main-wrapper {
+                padding: 30px 16px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
-
-    <div class="brand-badge">⚕</div>
-
-    <h1>CareConnect</h1>
-
-    <h2>Patient-Provider EHR System</h2>
-
-    <p>
-        A comprehensive Electronic Health Record portal for managing patient records,
-        appointments, clinical documentation, and prescriptions.
-    </p>
-
-    <!-- Direct Dashboard Portals -->
-    <div class="role-cards">
-        <a href="/login?role=PATIENT" class="role-btn">
-            <span class="icon">🩺</span>
-            <span class="title">Patient Portal</span>
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <a href="/" class="brand-container">
+            <div class="brand-icon">⚕</div>
+            <div>
+                <span class="brand-title">CareConnect</span>
+                <span class="brand-badge">Clinical EHR</span>
+            </div>
         </a>
 
-        <a href="/login?role=DOCTOR" class="role-btn">
-            <span class="icon">👨‍⚕️</span>
-            <span class="title">Doctor Portal</span>
-        </a>
+        <div class="nav-actions">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>System Online</span>
+            </div>
+        </div>
+    </header>
 
-        <a href="/login?role=ADMIN" class="role-btn">
-            <span class="icon">🛡️</span>
-            <span class="title">Admin Portal</span>
-        </a>
-    </div>
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
 
-    <div class="action-row">
-        <a href="/login" class="btn-primary">
-            Sign In
-        </a>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-pill">
+                <span>✨ Integrated Patient-Provider Healthcare Platform</span>
+            </div>
 
-        <a href="/register" class="btn-secondary">
-            Register Account
-        </a>
-    </div>
+            <h1>Connected Healthcare for <span>Patients & Doctors</span></h1>
 
-</div>
+            <p class="hero-description">
+                A unified Electronic Health Record (EHR) ecosystem facilitating seamless clinical consultations,
+                appointment scheduling, prescription records, and physician duty management.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="/login" class="btn-cta-primary">
+                    <span>Sign In to Portal</span>
+                    <span>→</span>
+                </a>
+
+                <a href="/register" class="btn-cta-secondary">
+                    <span>Create New Account</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section Intro -->
+        <div class="section-header">
+            <h2>Unified Portals & Capabilities</h2>
+            <p>Tailored access designed for healthcare consumers, medical practitioners, and administrators</p>
+        </div>
+
+        <!-- Informational Portal Cards (Non-Clickable Text) -->
+        <section class="portals-grid">
+
+            <!-- Patient Portal Card -->
+            <article class="portal-card patient">
+                <div class="card-top">
+                    <div class="card-icon">🩺</div>
+                    <span class="card-tag">For Patients</span>
+                </div>
+                <h3 class="portal-title">Patient Portal</h3>
+                <p class="portal-desc">
+                    Comprehensive digital health hub enabling patients to actively engage in their personal care journey.
+                </p>
+                <ul class="feature-list">
+                    <li><span class="feature-bullet">✓</span> Book appointments with verified specialists</li>
+                    <li><span class="feature-bullet">✓</span> View diagnostic notes & medical history</li>
+                    <li><span class="feature-bullet">✓</span> Access active prescriptions & medications</li>
+                </ul>
+            </article>
+
+            <!-- Doctor Portal Card -->
+            <article class="portal-card doctor">
+                <div class="card-top">
+                    <div class="card-icon">👨‍⚕️</div>
+                    <span class="card-tag">For Physicians</span>
+                </div>
+                <h3 class="portal-title">Doctor Portal</h3>
+                <p class="portal-desc">
+                    Clinical workflow cockpit designed to help doctors deliver high-quality care with efficiency.
+                </p>
+                <ul class="feature-list">
+                    <li><span class="feature-bullet">✓</span> Review patient appointment queues & rosters</li>
+                    <li><span class="feature-bullet">✓</span> Record medical records & diagnoses in real time</li>
+                    <li><span class="feature-bullet">✓</span> Issue digital prescriptions & dosage directions</li>
+                </ul>
+            </article>
+
+            <!-- Admin Portal Card -->
+            <article class="portal-card admin">
+                <div class="card-top">
+                    <div class="card-icon">🛡️</div>
+                    <span class="card-tag">For Management</span>
+                </div>
+                <h3 class="portal-title">Admin Portal</h3>
+                <p class="portal-desc">
+                    Centralized operational oversight ensuring compliance, staff coordination, and hospital capacity.
+                </p>
+                <ul class="feature-list">
+                    <li><span class="feature-bullet">✓</span> Manage doctor directory & patient records</li>
+                    <li><span class="feature-bullet">✓</span> Control doctor duty shifts & real-time availability</li>
+                    <li><span class="feature-bullet">✓</span> Monitor appointments & clinical operations</li>
+                </ul>
+            </article>
+
+        </section>
+
+        <!-- System Capabilities Strip -->
+        <section class="highlights-strip">
+            <div class="highlight-item">
+                <h4>🔒 Protected EHR</h4>
+                <p>Secure health records and private patient profiles</p>
+            </div>
+            <div class="highlight-item">
+                <h4>⚡ Real-Time Scheduling</h4>
+                <p>Live doctor availability and appointment sync</p>
+            </div>
+            <div class="highlight-item">
+                <h4>📋 Digital Prescriptions</h4>
+                <p>Direct physician-to-patient prescription regimens</p>
+            </div>
+            <div class="highlight-item">
+                <h4>📊 Clinical Continuity</h4>
+                <p>Longitudinal health records across encounters</p>
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 CareConnect Clinical EHR System. Designed for secure patient care & clinical excellence.</p>
+    </footer>
 
 </body>
-
 </html>

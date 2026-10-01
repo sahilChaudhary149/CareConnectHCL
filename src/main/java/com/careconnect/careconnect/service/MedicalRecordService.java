@@ -20,10 +20,10 @@ public class MedicalRecordService {
     }
 
     public List<MedicalRecord> getPatientRecords(Long patientId) {
-        return medicalRecordRepository.findByPatientId(patientId);
+        return medicalRecordRepository.findByPatientIdOrderByIdDesc(patientId);
     }
 
     public List<MedicalRecord> getAllRecords() {
-        return medicalRecordRepository.findAll();
+        return medicalRecordRepository.findAllByOrderByIdDesc();
     }
 }

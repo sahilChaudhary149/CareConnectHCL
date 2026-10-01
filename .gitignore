@@ -33,3 +33,9 @@ build/
 .vscode/
 .env
 *.class
+
+### IEEE SRS Documentation (Local Only) ###
+CareConnect_SRS_IEEE830.pdf
+SRS_Document.md
+careconnect_srs.html
+generate_srs_pdf.py

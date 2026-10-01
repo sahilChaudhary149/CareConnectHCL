@@ -39,13 +39,19 @@ public class PrescriptionController {
         }
 
         Prescription prescription = new Prescription();
-        prescription.setDoctorId(user.getId());
+        boolean isDoctor = "DOCTOR".equals(user.getRole());
+        if (isDoctor) {
+            prescription.setDoctorId(user.getId());
+        }
 
         List<User> patients = userRepository.findByRole("PATIENT");
-        String dashboardUrl = "DOCTOR".equals(user.getRole()) ? "/doctor-dashboard" : "/admin-dashboard";
+        List<User> doctors = userRepository.findByRole("DOCTOR");
+        String dashboardUrl = isDoctor ? "/doctor-dashboard" : "/admin-dashboard";
 
         model.addAttribute("prescription", prescription);
         model.addAttribute("patients", patients);
+        model.addAttribute("doctors", doctors);
+        model.addAttribute("isDoctor", isDoctor);
         model.addAttribute("doctorName", user.getName());
         model.addAttribute("dashboardUrl", dashboardUrl);
 

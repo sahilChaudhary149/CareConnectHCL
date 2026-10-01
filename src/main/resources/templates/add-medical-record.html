@@ -120,15 +120,26 @@
 
     <h1>Add Medical Record</h1>
 
-    <div class="doctor-badge">
-        <span>Attending Doctor:</span>
-        <strong th:text="${doctorName}">Doctor</strong>
-    </div>
-
     <form action="/add-medical-record" method="post" th:object="${medicalRecord}">
 
-        <!-- Hidden Doctor ID -->
-        <input type="hidden" th:field="*{doctorId}">
+        <!-- When Doctor is logged in -->
+        <div th:if="${isDoctor}" class="doctor-badge">
+            <span>Attending Doctor:</span>
+            <strong th:text="${doctorName}">Doctor</strong>
+            <input type="hidden" th:field="*{doctorId}">
+        </div>
+
+        <!-- When Admin is logged in: Select Doctor from dropdown -->
+        <div th:if="${!isDoctor}" class="form-group">
+            <label for="doctorSelect">Attending Doctor</label>
+            <select th:field="*{doctorId}" id="doctorSelect" required>
+                <option value="">-- Choose Attending Doctor --</option>
+                <option th:each="doc : ${doctors}"
+                        th:value="${doc.id}"
+                        th:text="${doc.name + (doc.specialization != null ? ' (' + doc.specialization + ')' : '')}">
+                </option>
+            </select>
+        </div>
 
         <!-- Patient Selection Dropdown -->
         <div class="form-group">

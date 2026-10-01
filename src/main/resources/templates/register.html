@@ -1,115 +1,464 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CareConnect - Register</title>
+    <title>CareConnect - Create Account</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f8fb;
+            background: linear-gradient(135deg, #e8f0fe 0%, #f4f8fb 100%);
+            margin: 0;
+            padding: 30px 15px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 12px 35px rgba(25, 118, 210, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+            padding: 35px 32px;
+            border: 1px solid #e1e8f0;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 50%;
+            font-size: 28px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.15);
+        }
+
+        .brand-header h1 {
+            color: #0d47a1;
+            font-size: 28px;
+            margin: 0 0 6px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-header p {
+            color: #64748b;
+            font-size: 14px;
             margin: 0;
         }
 
-        .container {
-            width: 400px;
-            margin: 70px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        /* Alert Messages */
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.4;
         }
 
-        h1 {
-            text-align: center;
-            color: #1976d2;
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
 
-        h3 {
-            text-align: center;
-            color: #333;
+        .alert-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .btn-login-redirect {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 14px;
+            background: #dc2626;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+
+        .btn-login-redirect:hover {
+            background: #b91c1c;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-top: 10px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
         }
 
-        input, select {
-            width: 100%;
-            padding: 11px;
-            margin: 8px 0 15px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
-        button {
+        .input-wrapper input,
+        .input-wrapper select {
             width: 100%;
-            padding: 12px;
-            background: #1976d2;
-            color: white;
+            padding: 12px 14px;
+            font-size: 14.5px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1e293b;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus,
+        .input-wrapper select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+        }
+
+        .input-wrapper input:-webkit-autofill,
+        .input-wrapper input:-webkit-autofill:hover, 
+        .input-wrapper input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+            -webkit-text-fill-color: #1e293b !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
             border: none;
-            border-radius: 5px;
+            color: #64748b;
             cursor: pointer;
+            padding: 4px;
+            font-size: 15px;
         }
 
-        button:hover {
-            background: #125ca1;
+        .toggle-password:hover {
+            color: #1e293b;
         }
 
-        .login {
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            background: #1976d2;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15.5px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #1565c0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(25, 118, 210, 0.35);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* Footer Links */
+        .register-footer {
+            margin-top: 20px;
             text-align: center;
-            margin-top: 15px;
+            font-size: 14px;
+            color: #64748b;
         }
 
-        .login a {
+        .register-footer a {
             color: #1976d2;
             text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .back-home:hover {
+            color: #64748b;
+        }
+
+        /* Doctor Specialty Field */
+        .specialty-container {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .specialty-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #065f46;
+        }
+
+        .specialty-hint {
+            font-size: 12px;
+            color: #047857;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="register-card">
 
-    <h1>CareConnect</h1>
+    <div class="brand-header">
+        <div class="brand-logo">⚕</div>
+        <h1>CareConnect</h1>
+        <p>Create your account to get started</p>
+    </div>
 
-    <h3>Create Account</h3>
+    <!-- Error Alert Box -->
+    <div th:if="${errorMessage != null}" class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-content">
+            <strong th:text="${errorMessage}">An account with this email already exists.</strong>
+            <div th:if="${isDuplicate}" style="margin-top: 8px;">
+                <a th:href="@{/login(role=${user?.role != null ? user.role : 'PATIENT'})}" class="btn-login-redirect">
+                    Sign in to your account →
+                </a>
+            </div>
+        </div>
+    </div>
 
-    <form action="/register" method="post">
+    <!-- Registration Form -->
+    <form action="/register" method="post" autocomplete="off">
 
-        <label>Name</label>
-        <input type="text" name="name" required>
+        <div class="form-group">
+            <label for="nameInput">Full Name</label>
+            <div class="input-wrapper">
+                <input type="text" id="nameInput" name="name" th:value="${user?.name}" placeholder="e.g. Gaurav Dwivedi" required autocomplete="off">
+            </div>
+        </div>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+        <div class="form-group">
+            <label for="emailInput">Email Address</label>
+            <div class="input-wrapper">
+                <input type="email" id="emailInput" name="email" th:value="${user?.email}" placeholder="e.g. name@example.com" required autocomplete="off" autocapitalize="none" spellcheck="false">
+            </div>
+        </div>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
+        <div class="form-group">
+            <label for="phoneInput">Mobile Number</label>
+            <div class="input-wrapper">
+                <input type="tel" id="phoneInput" name="phone" th:value="${user?.phone}" placeholder="e.g. +91 98765 43210" required autocomplete="tel">
+            </div>
+        </div>
 
-        <label>Role</label>
+        <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="passwordInput" name="password" placeholder="Create a strong password" required autocomplete="new-password">
+                <button type="button" class="toggle-password" id="togglePasswordBtn" onclick="togglePasswordVisibility()" title="Show/Hide Password">👁</button>
+            </div>
+        </div>
 
-        <select name="role" required>
-            <option value="">Select Role</option>
-            <option value="PATIENT">Patient</option>
-            <option value="DOCTOR">Doctor</option>
-            <option value="ADMIN">Admin</option>
-        </select>
+        <div class="form-group">
+            <label for="roleSelect">Account Role</label>
+            <div class="input-wrapper">
+                <select id="roleSelect" name="role" required onchange="handleRoleChange()">
+                    <option value="">Select Role</option>
+                    <option value="PATIENT" th:selected="${user?.role == 'PATIENT' || user?.role == null}">Patient</option>
+                    <option value="DOCTOR" th:selected="${user?.role == 'DOCTOR'}">Doctor</option>
+                    <option value="ADMIN" th:selected="${user?.role == 'ADMIN'}">Admin</option>
+                </select>
+            </div>
+        </div>
 
-        <button type="submit">Register</button>
+        <!-- Doctor Speciality Section (Active when DOCTOR role is selected) -->
+        <div class="specialty-container" id="specializationContainer" style="display: none;">
+            <div class="specialty-header">
+                <span>🩺</span>
+                <label for="specializationSelect" style="margin: 0; color: #065f46; font-weight: 600;">Doctor's Speciality (Clinical Department)</label>
+            </div>
+
+            <div class="input-wrapper">
+                <select id="specializationSelect" name="specialization" onchange="handleSpecialtySelectChange()">
+                    <option value="">-- Select Doctor's Speciality --</option>
+                    <option value="Cardiology" th:selected="${user?.specialization == 'Cardiology'}">Cardiology (Heart & Cardiovascular)</option>
+                    <option value="Neurology" th:selected="${user?.specialization == 'Neurology'}">Neurology (Brain & Nervous System)</option>
+                    <option value="Pediatrics" th:selected="${user?.specialization == 'Pediatrics'}">Pediatrics (Child Healthcare)</option>
+                    <option value="Orthopedics" th:selected="${user?.specialization == 'Orthopedics'}">Orthopedics (Bones & Joints)</option>
+                    <option value="Dermatology" th:selected="${user?.specialization == 'Dermatology'}">Dermatology (Skin & Hair)</option>
+                    <option value="General Medicine" th:selected="${user?.specialization == 'General Medicine'}">General Medicine (Internal & Family Care)</option>
+                    <option value="Oncology" th:selected="${user?.specialization == 'Oncology'}">Oncology (Cancer Treatment)</option>
+                    <option value="Gynecology" th:selected="${user?.specialization == 'Gynecology'}">Gynecology & Obstetrics (Women's Health)</option>
+                    <option value="Ophthalmology" th:selected="${user?.specialization == 'Ophthalmology'}">Ophthalmology (Eye & Vision)</option>
+                    <option value="Psychiatry" th:selected="${user?.specialization == 'Psychiatry'}">Psychiatry (Mental & Behavioral Health)</option>
+                    <option value="ENT / Otolaryngology" th:selected="${user?.specialization == 'ENT / Otolaryngology'}">ENT / Otolaryngology (Ear, Nose & Throat)</option>
+                    <option value="Gastroenterology" th:selected="${user?.specialization == 'Gastroenterology'}">Gastroenterology (Digestive Health)</option>
+                    <option value="Pulmonology" th:selected="${user?.specialization == 'Pulmonology'}">Pulmonology (Respiratory & Lungs)</option>
+                    <option value="Endocrinology" th:selected="${user?.specialization == 'Endocrinology'}">Endocrinology (Diabetes & Hormones)</option>
+                    <option value="Urology" th:selected="${user?.specialization == 'Urology'}">Urology (Urinary & Renal Tract)</option>
+                    <option value="Nephrology" th:selected="${user?.specialization == 'Nephrology'}">Nephrology (Kidney Specialist)</option>
+                    <option value="Dental Surgery" th:selected="${user?.specialization == 'Dental Surgery'}">Dental Surgery (Oral Healthcare)</option>
+                    <option value="OTHER">✨ Other Speciality (Specify New Option)...</option>
+                </select>
+            </div>
+
+            <!-- Custom Speciality Input if 'OTHER' is selected -->
+            <div id="customSpecialtyWrapper" style="display: none; margin-top: 10px;">
+                <label for="customSpecialization" style="font-size: 12.5px; color: #047857; font-weight: 600; margin-bottom: 4px; display: block;">Specify New Doctor Speciality</label>
+                <div class="input-wrapper">
+                    <input type="text" id="customSpecialization" name="customSpecialization" placeholder="e.g. Rheumatology, Pathology, Anesthesiology" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="specialty-hint">
+                🩺 This clinical speciality will appear on your Doctor Dashboard and in the patient consultation directory.
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <span>Register Account</span>
+            <span>→</span>
+        </button>
 
     </form>
 
-    <div class="login">
+    <div class="register-footer">
         Already have an account?
-        <a href="/login">Login</a>
+        <a th:href="@{/login(role=${user?.role != null ? user.role : 'PATIENT'})}">Login</a>
+
+        <a href="/" class="back-home">← Back to Homepage</a>
     </div>
 
 </div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('passwordInput');
+        const btn = document.getElementById('togglePasswordBtn');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            btn.textContent = '🙈';
+        } else {
+            passwordInput.type = 'password';
+            btn.textContent = '👁';
+        }
+    }
+
+    function handleRoleChange() {
+        const roleSelect = document.getElementById('roleSelect');
+        const specContainer = document.getElementById('specializationContainer');
+        const specSelect = document.getElementById('specializationSelect');
+        const customInput = document.getElementById('customSpecialization');
+
+        if (roleSelect.value === 'DOCTOR') {
+            specContainer.style.display = 'block';
+            specSelect.required = true;
+        } else {
+            specContainer.style.display = 'none';
+            specSelect.required = false;
+            if (customInput) customInput.required = false;
+        }
+    }
+
+    function handleSpecialtySelectChange() {
+        const specSelect = document.getElementById('specializationSelect');
+        const customWrapper = document.getElementById('customSpecialtyWrapper');
+        const customInput = document.getElementById('customSpecialization');
+
+        if (specSelect.value === 'OTHER') {
+            customWrapper.style.display = 'block';
+            customInput.required = true;
+            customInput.focus();
+        } else {
+            customWrapper.style.display = 'none';
+            customInput.required = false;
+        }
+    }
+
+    // Run when page DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        handleRoleChange();
+
+        const specSelect = document.getElementById('specializationSelect');
+        const customInput = document.getElementById('customSpecialization');
+        const existingSpec = "[[${user?.specialization}]]";
+
+        if (existingSpec && existingSpec !== 'null' && existingSpec.trim() !== '') {
+            let matched = false;
+            for (let i = 0; i < specSelect.options.length; i++) {
+                if (specSelect.options[i].value === existingSpec) {
+                    matched = true;
+                    specSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            if (!matched) {
+                specSelect.value = 'OTHER';
+                handleSpecialtySelectChange();
+                customInput.value = existingSpec;
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

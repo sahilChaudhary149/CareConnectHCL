@@ -33,6 +33,8 @@ public class AdminController {
         }
 
         model.addAttribute("adminName", user.getName());
+        model.addAttribute("doctorCount", userRepository.findByRole("DOCTOR").size());
+        model.addAttribute("patientCount", userRepository.findByRole("PATIENT").size());
 
         return "admin-dashboard";
     }
@@ -52,8 +54,21 @@ public class AdminController {
         }
 
         List<User> doctors = userRepository.findByRole("DOCTOR");
+        long availableCount = doctors.stream()
+                .filter(d -> "AVAILABLE".equalsIgnoreCase(d.getAvailabilityStatus()))
+                .count();
+        long specCount = doctors.stream()
+                .map(User::getSpecialization)
+                .filter(s -> s != null && !s.trim().isEmpty())
+                .distinct()
+                .count();
 
+        model.addAttribute("adminName", user.getName());
         model.addAttribute("doctors", doctors);
+        model.addAttribute("totalDoctors", doctors.size());
+        model.addAttribute("availableCount", availableCount);
+        model.addAttribute("unavailableCount", doctors.size() - availableCount);
+        model.addAttribute("specCount", specCount);
 
         return "doctors";
     }
@@ -78,6 +93,7 @@ public class AdminController {
                 .filter(d -> "AVAILABLE".equalsIgnoreCase(d.getAvailabilityStatus()))
                 .count();
 
+        model.addAttribute("adminName", user.getName());
         model.addAttribute("doctors", doctors);
         model.addAttribute("totalDoctors", doctors.size());
         model.addAttribute("availableCount", availableCount);
@@ -150,8 +166,14 @@ public class AdminController {
         }
 
         List<User> patients = userRepository.findByRole("PATIENT");
+        long phoneCount = patients.stream()
+                .filter(p -> p.getPhone() != null && !p.getPhone().trim().isEmpty())
+                .count();
 
+        model.addAttribute("adminName", user.getName());
         model.addAttribute("patients", patients);
+        model.addAttribute("totalPatients", patients.size());
+        model.addAttribute("phoneCount", phoneCount);
 
         return "patients";
     }

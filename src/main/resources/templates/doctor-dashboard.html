@@ -1,185 +1,1340 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Dashboard - CareConnect</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
+            padding: 0;
         }
 
+        :root {
+            --primary: #059669;
+            --primary-dark: #065f46;
+            --primary-light: #ecfdf5;
+            --bg-page: linear-gradient(135deg, #eef7f2 0%, #f7fafc 50%, #e8f4ee 100%);
+            --slate-800: #1e293b;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--slate-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
         .navbar {
-            background: #0d6efd;
-            color: white;
-            padding: 18px 40px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--slate-200);
+            padding: 14px 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .navbar h2 {
-            margin: 0;
-        }
-
-        .logout {
-            color: white;
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             text-decoration: none;
-            background: #dc3545;
-            padding: 8px 15px;
-            border-radius: 5px;
         }
 
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+        }
+
+        .brand-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #065f46;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .portal-badge {
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--slate-200);
+            font-size: 13.5px;
+            color: var(--slate-600);
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: #dcfce7;
+            color: #15803d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #fca5a5;
+            color: #991b1b;
+        }
+
+        /* Main Container */
         .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 40px auto;
+            max-width: 1100px;
+            width: 92%;
+            margin: 35px auto 50px;
+            flex: 1;
         }
 
-        h1 {
-            color: #0d6efd;
+        /* Welcome Banner Card */
+        .welcome-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 28px 32px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 20px;
+            background-image: radial-gradient(circle at 100% 0%, #ecfdf5 0%, transparent 60%);
         }
 
-        .cards {
+        .welcome-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-text p {
+            color: var(--slate-500);
+            font-size: 15px;
+            line-height: 1.5;
+            max-width: 600px;
+        }
+
+        .doctor-badge-info {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 12px 18px;
+            border-radius: 12px;
+            text-align: right;
+        }
+
+        .doctor-badge-info .spec-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #15803d;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .doctor-badge-info .spec-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #065f46;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Action Cards Grid */
+        .cards-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            margin-top: 30px;
+            gap: 24px;
+            margin-bottom: 35px;
         }
 
-        .card {
-            background: white;
-            padding: 30px;
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .card-appts::before { background: #059669; }
+        .card-records::before { background: #0284c7; }
+        .card-prescriptions::before { background: #7c3aed; }
+        .card-availability::before { background: #d97706; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-appts .card-icon { background: #f0fdf4; color: #059669; }
+        .card-records .card-icon { background: #f0f9ff; color: #0284c7; }
+        .card-prescriptions .card-icon { background: #faf5ff; color: #7c3aed; }
+        .card-availability .card-icon { background: #fefce8; color: #d97706; }
+
+        .card-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .card-appts .card-tag { background: #dcfce7; color: #15803d; }
+        .card-records .card-tag { background: #e0f2fe; color: #0369a1; }
+        .card-prescriptions .card-tag { background: #f3e8ff; color: #7c3aed; }
+        .card-availability .card-tag { background: #fef9c3; color: #a16207; }
+
+        .card-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.5;
+            margin-bottom: 22px;
+            flex-grow: 1;
+        }
+
+        /* Schedule Details Preview */
+        .schedule-preview {
+            background: #f8fafc;
+            border: 1px dashed var(--slate-200);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: var(--slate-600);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .schedule-row strong {
+            color: #0f172a;
+        }
+
+        /* Card Button Controls */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-action-primary {
+            background: #059669;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+        }
+
+        .btn-action-primary:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+
+        .btn-action-secondary {
+            background: #f8fafc;
+            color: #334155;
+            border: 1px solid var(--slate-200);
+            padding: 9px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action-secondary:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Doctor Stats Bubbles in Welcome Card */
+        .doctor-stats-badges {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-bubble {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            padding: 10px 18px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            min-width: 105px;
         }
 
-        .card h3 {
-            color: #0d6efd;
+        .bubble-num {
+            display: block;
+            font-size: 22px;
+            font-weight: 800;
+            color: #059669;
+            line-height: 1.2;
         }
 
-        .card p {
-            color: #666;
-            min-height: 45px;
+        .bubble-lbl {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
-        .button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 18px;
-            background: #0d6efd;
-            color: white;
-            text-decoration: none;
+        /* Live Records Table Card */
+        .records-container-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            margin-bottom: 35px;
+            overflow: hidden;
+        }
+
+        .records-header {
+            padding: 20px 28px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--slate-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .tab-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            color: var(--slate-600);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            border-color: #cbd5e1;
+            color: #0f172a;
+            background: #f1f5f9;
+        }
+
+        .tab-btn.active {
+            background: #059669;
+            color: #ffffff;
+            border-color: #059669;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+        }
+
+        .tab-badge {
+            background: rgba(0, 0, 0, 0.08);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .tab-btn.active .tab-badge {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead th {
+            background: #ffffff;
+            padding: 14px 22px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1.5px solid var(--slate-200);
+        }
+
+        tbody td {
+            padding: 16px 22px;
+            font-size: 13.5px;
+            color: var(--slate-700);
+            border-bottom: 1px solid var(--slate-200);
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge-id {
+            background: #f1f5f9;
+            color: var(--slate-700);
+            padding: 3px 8px;
             border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
         }
 
-        .button:hover {
-            background: #0b5ed7;
+        .primary-cell {
+            font-weight: 700;
+            color: #0f172a;
         }
 
-        @media (max-width: 700px) {
-            .cards {
+        .sub-cell {
+            font-size: 12px;
+            color: var(--slate-500);
+            margin-top: 2px;
+        }
+
+        .schedule-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 13px;
+        }
+
+        .schedule-icon {
+            font-size: 14px;
+        }
+
+        .reason-text {
+            color: var(--slate-600);
+            font-size: 13.5px;
+            max-width: 280px;
+            display: block;
+        }
+
+        .notes-text {
+            color: var(--slate-600);
+            font-size: 13px;
+            line-height: 1.4;
+            max-width: 360px;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-confirmed {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-pending {
+            background: #fef9c3;
+            color: #a16207;
+            border: 1px solid #fef08a;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .duration-badge {
+            background: #f3e8ff;
+            color: #7c3aed;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .table-link {
+            color: #059669;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .table-link:hover {
+            color: #047857;
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--slate-500);
+            padding: 30px;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            background: #ffffff;
+            border-top: 1px solid var(--slate-200);
+            padding: 18px 35px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-top: auto;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 820px) {
+            .cards-grid {
                 grid-template-columns: 1fr;
             }
+
+            .welcome-card {
+                padding: 22px;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .doctor-badge-info {
+                text-align: center;
+                width: 100%;
+            }
+
+            .welcome-text p {
+                max-width: 100%;
+            }
+
+            .navbar {
+                padding: 12px 18px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--slate-200);
+            position: relative;
+            animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-sub {
+            color: var(--slate-500);
+            font-size: 13.5px;
+            margin-bottom: 22px;
+        }
+
+        .modal-form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .modal-form-group select,
+        .modal-form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1e293b;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-form-group select:focus,
+        .modal-form-group input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+        }
+
+        .modal-btn-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-modal-cancel {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--slate-200);
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-modal-submit {
+            background: #059669;
+            color: #ffffff;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+            transition: all 0.15s;
+        }
+
+        .btn-modal-submit:hover {
+            background: #047857;
         }
     </style>
 </head>
 
 <body>
 
-<div class="navbar">
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+        <a href="/doctor-dashboard" class="brand-container">
+            <div class="brand-icon">⚕</div>
+            <div class="brand-text">
+                <h2>
+                    <span>CareConnect</span>
+                    <span class="portal-badge">Doctor Cockpit</span>
+                </h2>
+            </div>
+        </a>
 
-    <h2>CareConnect</h2>
+        <div class="nav-right">
+            <div class="status-pill" th:if="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}">
+                <span class="status-dot"></span>
+                <span>Active Clinical Duty</span>
+            </div>
+            <div class="status-pill" th:unless="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}" style="background: #fef2f2; color: #dc2626; border-color: #fecaca;">
+                <span class="status-dot" style="background: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);"></span>
+                <span>Off Duty / Unavailable</span>
+            </div>
 
-    <a href="/logout" class="logout">
-        Logout
-    </a>
+            <div class="user-profile">
+                <span class="user-avatar">👨‍⚕️</span>
+                <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+                    <span style="font-weight: 600;" th:text="${doctorName != null && !doctorName.isEmpty() ? doctorName : 'Attending Physician'}">Doctor</span>
+                    <span style="font-size: 11px; color: #059669; font-weight: 700;" th:text="${specialization != null && !specialization.isEmpty() ? specialization : 'General Medicine'}">General Medicine</span>
+                </div>
+            </div>
 
-</div>
-
-<div class="container">
-
-    <h1>Doctor Dashboard</h1>
-
-    <p>Manage patient care and clinical information.</p>
-
-    <div class="cards">
-
-        <!-- Appointments -->
-
-        <div class="card">
-
-            <h3>Appointments</h3>
-
-            <p>
-                View and manage patient appointments.
-            </p>
-
-            <a href="/appointments" class="button">
-                View Appointments
+            <a href="/logout" class="logout-btn">
+                <span>Sign Out</span>
+                <span>↳</span>
             </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- Success Alert Message -->
+        <div th:if="${successMessage != null}" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 14px 20px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14.5px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.08);">
+            <span style="font-size: 20px;">✅</span>
+            <span th:text="${successMessage}">Doctor speciality and duty schedule updated successfully!</span>
+        </div>
+
+        <!-- Welcome Banner Card -->
+        <section class="welcome-card">
+            <div class="welcome-text">
+                <h1>Welcome, <span th:text="${doctorName != null && !doctorName.isEmpty() ? doctorName : 'Doctor'}">Doctor</span> 👋</h1>
+                <p>
+                    Manage clinical patient encounters, record official diagnostic observations,
+                    issue electronic prescription regimens, and review upcoming consultation rosters.
+                </p>
+            </div>
+
+            <div class="doctor-stats-badges">
+                <div class="stat-bubble">
+                    <span class="bubble-num" th:text="${totalAppts != null ? totalAppts : 0}">20</span>
+                    <span class="bubble-lbl">Consultations</span>
+                </div>
+                <div class="stat-bubble">
+                    <span class="bubble-num" th:text="${totalRecords != null ? totalRecords : 0}">20</span>
+                    <span class="bubble-lbl">EHR Charts</span>
+                </div>
+                <div class="stat-bubble">
+                    <span class="bubble-num" th:text="${totalPrescriptions != null ? totalPrescriptions : 0}">20</span>
+                    <span class="bubble-lbl">Prescriptions</span>
+                </div>
+                <div class="doctor-badge-info" style="margin-left: 6px;">
+                    <span class="spec-label">Specialization</span>
+                    <span class="spec-name" th:text="${specialization != null && !specialization.isEmpty() ? specialization : 'General Medicine'}">General Medicine</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clinical Workflows Section Title -->
+        <div class="section-title">
+            <span>Clinical Workflows & Operations</span>
+        </div>
+
+        <!-- 2x2 Services Cards Grid -->
+        <div class="cards-grid">
+
+            <!-- Card 1: Appointments Queue -->
+            <article class="dashboard-card card-appts">
+                <div class="card-header">
+                    <div class="card-icon">📅</div>
+                    <span class="card-tag">Consultations</span>
+                </div>
+                <h2 class="card-title">Appointments Queue</h2>
+                <p class="card-desc">
+                    Review assigned patient consultations, confirm incoming visit bookings, and manage schedule flow in real time.
+                </p>
+
+                <!-- Consultation Metrics -->
+                <div style="background: #f8fafc; border: 1px dashed var(--slate-200); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                    <div style="background: #ffffff; padding: 8px 6px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <span style="font-size: 11px; color: var(--slate-500); display: block; font-weight: 600; text-transform: uppercase;">Total</span>
+                        <strong style="font-size: 18px; color: #0f172a; font-weight: 800;" th:text="${totalAppts != null ? totalAppts : 0}">0</strong>
+                    </div>
+                    <div style="background: #ffffff; padding: 8px 6px; border-radius: 8px; border: 1px solid #fed7aa;">
+                        <span style="font-size: 11px; color: #ea580c; display: block; font-weight: 600; text-transform: uppercase;">Pending</span>
+                        <strong style="font-size: 18px; color: #c2410c; font-weight: 800;" th:text="${pendingAppts != null ? pendingAppts : 0}">0</strong>
+                    </div>
+                    <div style="background: #ffffff; padding: 8px 6px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        <span style="font-size: 11px; color: #16a34a; display: block; font-weight: 600; text-transform: uppercase;">Confirmed</span>
+                        <strong style="font-size: 18px; color: #15803d; font-weight: 800;" th:text="${confirmedAppts != null ? confirmedAppts : 0}">0</strong>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a href="/appointments" class="btn-action-primary">
+                        <span>Review Appointments Queue</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Card 2: Clinical Documentation -->
+            <article class="dashboard-card card-records">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <span class="card-tag">EHR Charts</span>
+                </div>
+                <h2 class="card-title">Clinical Documentation</h2>
+                <p class="card-desc">
+                    Record new patient diagnoses, clinical progress observations, and access longitudinal medical records.
+                </p>
+                <div style="font-size: 12.5px; color: #0284c7; font-weight: 700; margin-bottom: 16px; background: #f0f9ff; padding: 6px 12px; border-radius: 8px; border: 1px solid #bae6fd; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>📋</span>
+                    <span>Total Clinical Records: <strong th:text="${totalRecords != null ? totalRecords : 0}">20</strong> documented</span>
+                </div>
+                <div class="card-actions">
+                    <a href="/add-medical-record" class="btn-action-primary">
+                        <span>+ Add Medical Record</span>
+                    </a>
+                    <a href="/medical-records" class="btn-action-secondary">
+                        <span>View Records</span>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Card 3: Prescriptions -->
+            <article class="dashboard-card card-prescriptions">
+                <div class="card-header">
+                    <div class="card-icon">💊</div>
+                    <span class="card-tag">Rx Regimens</span>
+                </div>
+                <h2 class="card-title">Prescriptions</h2>
+                <p class="card-desc">
+                    Generate electronic prescriptions with precise dosage directions, treatment durations, and pharmacy instructions.
+                </p>
+                <div style="font-size: 12.5px; color: #7c3aed; font-weight: 700; margin-bottom: 16px; background: #faf5ff; padding: 6px 12px; border-radius: 8px; border: 1px solid #e9d5ff; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>💊</span>
+                    <span>Issued Medications: <strong th:text="${totalPrescriptions != null ? totalPrescriptions : 0}">20</strong> active</span>
+                </div>
+                <div class="card-actions">
+                    <a href="/add-prescription" class="btn-action-primary">
+                        <span>+ Add Prescription</span>
+                    </a>
+                    <a href="/prescriptions" class="btn-action-secondary">
+                        <span>View Prescriptions</span>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Card 4: Duty Schedule & Hours -->
+            <article class="dashboard-card card-availability">
+                <div class="card-header">
+                    <div class="card-icon">🕒</div>
+                    <span class="card-tag">Practice Hours</span>
+                </div>
+                <h2 class="card-title">Duty Schedule & Status</h2>
+                <p class="card-desc">
+                    Your scheduled clinic duty hours, active consultation availability, and clinical specialization.
+                </p>
+
+                <div class="schedule-preview">
+                    <div class="schedule-row">
+                        <span>Clinical Speciality:</span>
+                        <strong style="color: #059669; font-weight: 700;" th:text="${specialization != null && !specialization.isEmpty() ? specialization : 'General Medicine'}">General Medicine</strong>
+                    </div>
+                    <div class="schedule-row">
+                        <span>Working Days:</span>
+                        <strong th:text="${availableDays != null && !availableDays.isEmpty() ? availableDays : 'Monday - Friday'}">Monday - Friday</strong>
+                    </div>
+                    <div class="schedule-row">
+                        <span>Clinic Timings:</span>
+                        <strong th:text="${availableTime != null && !availableTime.isEmpty() ? availableTime : '09:00 AM - 05:00 PM'}">09:00 AM - 05:00 PM</strong>
+                    </div>
+                    <div class="schedule-row">
+                        <span>Duty Status:</span>
+                        <span th:if="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}" style="color: #15803d; font-weight: 700; background: #dcfce7; padding: 2px 8px; border-radius: 6px; font-size: 12px;">● ON DUTY</span>
+                        <span th:unless="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}" style="color: #b91c1c; font-weight: 700; background: #fee2e2; padding: 2px 8px; border-radius: 6px; font-size: 12px;">○ OFF DUTY</span>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button type="button" class="btn-action-primary" onclick="openDoctorProfileModal()">
+                        <span>✏️ Update Speciality & Hours</span>
+                    </button>
+                    <a th:if="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}" href="/doctor/toggle-duty" class="btn-action-secondary" style="color: #b91c1c; border-color: #fecaca; background: #fff1f2;">
+                        <span>🔴 Set Off Duty</span>
+                    </a>
+                    <a th:unless="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}" href="/doctor/toggle-duty" class="btn-action-secondary" style="color: #15803d; border-color: #bbf7d0; background: #f0fdf4;">
+                        <span>🟢 Set On Duty</span>
+                    </a>
+                </div>
+            </article>
 
         </div>
 
+        <!-- Live Doctor Clinical Records & Activity (20 Entries) -->
+        <section class="records-container-card">
+            <div class="records-header">
+                <div>
+                    <h2 style="font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                        <span>🩺</span>
+                        <span>Clinical Duty Activity & Patient Consultations</span>
+                    </h2>
+                    <p style="font-size: 13.5px; color: var(--slate-500);">
+                        Manage your 20 assigned patient consultations, electronic health diagnoses, and active prescription regimens.
+                    </p>
+                </div>
 
-        <!-- Medical Records -->
+                <!-- Tab Buttons -->
+                <div class="tab-controls">
+                    <button type="button" class="tab-btn active" id="btnDocTabAppts" onclick="switchDoctorTab('appts')">
+                        <span>📅 Consultations Queue</span>
+                        <span class="tab-badge" th:text="${totalAppts != null ? totalAppts : 0}">20</span>
+                    </button>
+                    <button type="button" class="tab-btn" id="btnDocTabRecords" onclick="switchDoctorTab('records')">
+                        <span>📋 EHR Clinical Records</span>
+                        <span class="tab-badge" th:text="${totalRecords != null ? totalRecords : 0}">20</span>
+                    </button>
+                    <button type="button" class="tab-btn" id="btnDocTabRx" onclick="switchDoctorTab('rx')">
+                        <span>💊 Prescriptions Issued</span>
+                        <span class="tab-badge" th:text="${totalPrescriptions != null ? totalPrescriptions : 0}">20</span>
+                    </button>
+                </div>
+            </div>
 
-        <div class="card">
+            <!-- Tab 1: Appointments Table (20 Entries) -->
+            <div id="doctorTabAppts" class="tab-pane active">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">ID</th>
+                                <th>Patient Name & Contact</th>
+                                <th>Appointment Schedule</th>
+                                <th>Reason for Consultation</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="appt : ${appointments}">
+                                <td>
+                                    <span class="badge-id" th:text="${'#' + appt.id}">#1</span>
+                                </td>
+                                <td>
+                                    <div class="primary-cell" th:text="${appt.patientName}">John Doe</div>
+                                    <div class="sub-cell" th:text="${appt.patientEmail != null && !appt.patientEmail.isEmpty() ? appt.patientEmail : (appt.patientPhone != null ? appt.patientPhone : 'Patient #' + appt.patientId)}">patient@demo.com</div>
+                                </td>
+                                <td>
+                                    <div class="schedule-cell">
+                                        <span class="schedule-icon">🕒</span>
+                                        <span th:text="${appt.appointmentDate != null ? #strings.replace(appt.appointmentDate, 'T', ' at ') : 'TBD'}">2026-10-02 at 10:30</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="reason-text" th:text="${appt.reason}">Routine Cardiac Wellness</span>
+                                </td>
+                                <td>
+                                    <span th:if="${appt.status == 'CONFIRMED'}" class="status-pill status-confirmed">Confirmed</span>
+                                    <span th:if="${appt.status == 'PENDING'}" class="status-pill status-pending">Pending Review</span>
+                                    <span th:if="${appt.status == 'REJECTED'}" class="status-pill status-rejected">Cancelled</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a th:if="${appt.status == 'PENDING'}" th:href="@{'/appointment/confirm/' + ${appt.id}}" class="table-link" style="color: #059669; font-weight: 700; margin-right: 8px;">Confirm ✓</a>
+                                    <a href="/appointments" class="table-link">Manage →</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(appointments)}">
+                                <td colspan="6" class="empty-state">No patient appointments assigned.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <h3>Clinical Documentation</h3>
+            <!-- Tab 2: Medical Records Table (20 Entries) -->
+            <div id="doctorTabRecords" class="tab-pane" style="display: none;">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Record #</th>
+                                <th>Diagnostic Evaluation</th>
+                                <th>Patient Name</th>
+                                <th>Clinical Progress Notes & Assessment</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="rec : ${medicalRecords}">
+                                <td>
+                                    <span class="badge-id" th:text="${'#MR-' + rec.id}">#MR-1</span>
+                                </td>
+                                <td>
+                                    <div class="primary-cell" th:text="${rec.diagnosis}">Stage 1 Essential Hypertension</div>
+                                    <div class="sub-cell" style="color: #059669;">Clinical Diagnostic Entry</div>
+                                </td>
+                                <td>
+                                    <div class="primary-cell" th:text="${patientMap[rec.patientId] != null ? patientMap[rec.patientId].name : 'Patient #' + rec.patientId}">John Doe</div>
+                                    <div class="sub-cell" th:if="${patientMap[rec.patientId] != null && patientMap[rec.patientId].email != null}" th:text="${patientMap[rec.patientId].email}">patient@example.com</div>
+                                </td>
+                                <td>
+                                    <p class="notes-text" th:text="${rec.clinicalNotes}">BP recorded at 140/88 mmHg. Advised low-sodium DASH diet regimen.</p>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="/medical-records" class="table-link">View Full Chart →</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(medicalRecords)}">
+                                <td colspan="5" class="empty-state">No clinical documentation recorded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <p>
-                Add diagnosis and clinical notes
-                for patients.
-            </p>
+            <!-- Tab 3: Prescriptions Table (20 Entries) -->
+            <div id="doctorTabRx" class="tab-pane" style="display: none;">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Rx #</th>
+                                <th>Prescription Drug</th>
+                                <th>Patient Name</th>
+                                <th>Dosage Regimen</th>
+                                <th>Duration</th>
+                                <th>Instructions</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="rx : ${prescriptions}">
+                                <td>
+                                    <span class="badge-id" th:text="${'#RX-' + rx.id}">#RX-1</span>
+                                </td>
+                                <td>
+                                    <div class="primary-cell" style="color: #7c3aed;" th:text="${rx.medicineName}">Amlodipine Besylate</div>
+                                    <div class="sub-cell">Electronic Prescription</div>
+                                </td>
+                                <td>
+                                    <div class="primary-cell" th:text="${patientMap[rx.patientId] != null ? patientMap[rx.patientId].name : 'Patient #' + rx.patientId}">John Doe</div>
+                                    <div class="sub-cell" th:if="${patientMap[rx.patientId] != null && patientMap[rx.patientId].email != null}" th:text="${patientMap[rx.patientId].email}">patient@example.com</div>
+                                </td>
+                                <td>
+                                    <strong style="color: #0f172a; font-size: 13.5px;" th:text="${rx.dosage}">5 mg - Once daily</strong>
+                                </td>
+                                <td>
+                                    <span class="duration-badge" th:text="${rx.duration}">30 Days</span>
+                                </td>
+                                <td>
+                                    <span class="notes-text" th:text="${rx.instructions}">Take with or without food.</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="/prescriptions" class="table-link">Review Rx →</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(prescriptions)}">
+                                <td colspan="7" class="empty-state">No prescriptions issued yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <a href="/add-medical-record" class="button">
-                Add Medical Record
-            </a>
+        </section>
 
+    </main>
+
+    <!-- Update Speciality & Schedule Modal -->
+    <div class="modal-overlay" id="doctorProfileModal">
+        <div class="modal-card">
+            <h3 class="modal-title">
+                <span>🩺</span>
+                <span>Update Speciality & Schedule</span>
+            </h3>
+            <p class="modal-sub">Modify your clinical speciality and clinic working hours.</p>
+
+            <form action="/doctor/update-specialty" method="post" id="updateSpecialtyForm">
+                <div class="modal-form-group">
+                    <label for="modalSpecializationSelect">Doctor's Speciality</label>
+                    <select id="modalSpecializationSelect" name="specialization" onchange="handleModalSpecialtyChange()" required>
+                        <option value="Cardiology" th:selected="${specialization == 'Cardiology'}">Cardiology (Heart & Cardiovascular)</option>
+                        <option value="Neurology" th:selected="${specialization == 'Neurology'}">Neurology (Brain & Nervous System)</option>
+                        <option value="Pediatrics" th:selected="${specialization == 'Pediatrics'}">Pediatrics (Child Healthcare)</option>
+                        <option value="Orthopedics" th:selected="${specialization == 'Orthopedics'}">Orthopedics (Bones & Joints)</option>
+                        <option value="Dermatology" th:selected="${specialization == 'Dermatology'}">Dermatology (Skin & Hair)</option>
+                        <option value="General Medicine" th:selected="${specialization == 'General Medicine' || specialization == null}">General Medicine (Internal & Family Care)</option>
+                        <option value="Oncology" th:selected="${specialization == 'Oncology'}">Oncology (Cancer Treatment)</option>
+                        <option value="Gynecology" th:selected="${specialization == 'Gynecology'}">Gynecology & Obstetrics (Women's Health)</option>
+                        <option value="Ophthalmology" th:selected="${specialization == 'Ophthalmology'}">Ophthalmology (Eye & Vision)</option>
+                        <option value="Psychiatry" th:selected="${specialization == 'Psychiatry'}">Psychiatry (Mental & Behavioral Health)</option>
+                        <option value="ENT / Otolaryngology" th:selected="${specialization == 'ENT / Otolaryngology'}">ENT / Otolaryngology (Ear, Nose & Throat)</option>
+                        <option value="Gastroenterology" th:selected="${specialization == 'Gastroenterology'}">Gastroenterology (Digestive Health)</option>
+                        <option value="Pulmonology" th:selected="${specialization == 'Pulmonology'}">Pulmonology (Respiratory & Lungs)</option>
+                        <option value="Endocrinology" th:selected="${specialization == 'Endocrinology'}">Endocrinology (Diabetes & Hormones)</option>
+                        <option value="Urology" th:selected="${specialization == 'Urology'}">Urology (Urinary & Renal Tract)</option>
+                        <option value="Nephrology" th:selected="${specialization == 'Nephrology'}">Nephrology (Kidney Specialist)</option>
+                        <option value="Dental Surgery" th:selected="${specialization == 'Dental Surgery'}">Dental Surgery (Oral Healthcare)</option>
+                        <option value="OTHER">✨ Other Speciality (Specify New Option)...</option>
+                    </select>
+                </div>
+
+                <div class="modal-form-group" id="modalCustomSpecialtyWrapper" style="display: none;">
+                    <label for="modalCustomSpecialtyInput">Specify New Doctor Speciality</label>
+                    <input type="text" id="modalCustomSpecialtyInput" name="customSpecialization" placeholder="e.g. Rheumatology, Pathology, Anesthesiology">
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="modalAvailableDays">Working Days</label>
+                    <input type="text" id="modalAvailableDays" name="availableDays" th:value="${availableDays != null && !availableDays.isEmpty() ? availableDays : 'Monday - Friday'}" placeholder="e.g. Mon - Fri" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="modalAvailableTime">Shift / Available Hours</label>
+                    <input type="text" id="modalAvailableTime" name="availableTime" th:value="${availableTime != null && !availableTime.isEmpty() ? availableTime : '09:00 AM - 05:00 PM'}" placeholder="e.g. 09:00 AM - 05:00 PM" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="modalAvailabilityStatus">Consultation Duty Status</label>
+                    <select id="modalAvailabilityStatus" name="availabilityStatus" required>
+                        <option value="AVAILABLE" th:selected="${availabilityStatus == 'AVAILABLE' || availabilityStatus == null}">AVAILABLE (On Duty)</option>
+                        <option value="UNAVAILABLE" th:selected="${availabilityStatus == 'UNAVAILABLE'}">UNAVAILABLE (Off Duty)</option>
+                    </select>
+                </div>
+
+                <div class="modal-btn-row">
+                    <button type="button" class="btn-modal-cancel" onclick="closeDoctorProfileModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-submit">Save Speciality & Schedule</button>
+                </div>
+            </form>
         </div>
-
-
-        <!-- Prescriptions -->
-
-        <div class="card">
-
-            <h3>Prescriptions</h3>
-
-            <p>
-                Create prescriptions for patients.
-            </p>
-
-            <a href="/add-prescription" class="button">
-                Add Prescription
-            </a>
-
-        </div>
-
-
-        <!-- Medical Records -->
-
-        <div class="card">
-
-            <h3>Medical Records</h3>
-
-            <p>
-                View clinical records stored in CareConnect.
-            </p>
-
-            <a href="/medical-records" class="button">
-                View Records
-            </a>
-
-        </div>
-
     </div>
 
-</div>
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 CareConnect Clinical EHR System. Confidential & HIPAA Compliant Provider Environment.</p>
+    </footer>
+
+<script>
+    function switchDoctorTab(tabName) {
+        const tabAppts = document.getElementById('doctorTabAppts');
+        const tabRecords = document.getElementById('doctorTabRecords');
+        const tabRx = document.getElementById('doctorTabRx');
+
+        const btnAppts = document.getElementById('btnDocTabAppts');
+        const btnRecords = document.getElementById('btnDocTabRecords');
+        const btnRx = document.getElementById('btnDocTabRx');
+
+        if (tabAppts) tabAppts.style.display = tabName === 'appts' ? 'block' : 'none';
+        if (tabRecords) tabRecords.style.display = tabName === 'records' ? 'block' : 'none';
+        if (tabRx) tabRx.style.display = tabName === 'rx' ? 'block' : 'none';
+
+        if (btnAppts) btnAppts.classList.toggle('active', tabName === 'appts');
+        if (btnRecords) btnRecords.classList.toggle('active', tabName === 'records');
+        if (btnRx) btnRx.classList.toggle('active', tabName === 'rx');
+    }
+
+    function openDoctorProfileModal() {
+        document.getElementById('doctorProfileModal').style.display = 'flex';
+    }
+
+    function closeDoctorProfileModal() {
+        document.getElementById('doctorProfileModal').style.display = 'none';
+    }
+
+    function handleModalSpecialtyChange() {
+        const select = document.getElementById('modalSpecializationSelect');
+        const customWrapper = document.getElementById('modalCustomSpecialtyWrapper');
+        const customInput = document.getElementById('modalCustomSpecialtyInput');
+        if (select.value === 'OTHER') {
+            customWrapper.style.display = 'block';
+            customInput.required = true;
+            customInput.focus();
+        } else {
+            customWrapper.style.display = 'none';
+            customInput.required = false;
+        }
+    }
+
+    window.onclick = function(e) {
+        const modal = document.getElementById('doctorProfileModal');
+        if (e.target === modal) {
+            closeDoctorProfileModal();
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('modalSpecializationSelect');
+        const customWrapper = document.getElementById('modalCustomSpecialtyWrapper');
+        const customInput = document.getElementById('modalCustomSpecialtyInput');
+        const currentSpec = "[[${specialization}]]";
+
+        if (currentSpec && currentSpec !== 'null' && currentSpec.trim() !== '') {
+            let found = false;
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === currentSpec) {
+                    found = true;
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
+            if (!found) {
+                select.value = 'OTHER';
+                customWrapper.style.display = 'block';
+                customInput.value = currentSpec;
+                customInput.required = true;
+            }
+        }
+    });
+</script>
 
 </body>
 

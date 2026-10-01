@@ -78,14 +78,20 @@ public class MedicalRecordController {
         }
 
         MedicalRecord record = new MedicalRecord();
-        record.setDoctorId(user.getId());
+        boolean isDoctor = "DOCTOR".equals(user.getRole());
+        if (isDoctor) {
+            record.setDoctorId(user.getId());
+        }
 
         List<User> patients = userRepository.findByRole("PATIENT");
+        List<User> doctors = userRepository.findByRole("DOCTOR");
 
-        String dashboardUrl = "DOCTOR".equals(user.getRole()) ? "/doctor-dashboard" : "/admin-dashboard";
+        String dashboardUrl = isDoctor ? "/doctor-dashboard" : "/admin-dashboard";
 
         model.addAttribute("medicalRecord", record);
         model.addAttribute("patients", patients);
+        model.addAttribute("doctors", doctors);
+        model.addAttribute("isDoctor", isDoctor);
         model.addAttribute("doctorName", user.getName());
         model.addAttribute("dashboardUrl", dashboardUrl);
 

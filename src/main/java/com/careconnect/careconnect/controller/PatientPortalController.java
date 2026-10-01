@@ -69,7 +69,7 @@ public class PatientPortalController {
                     user.getEmail(),
                     user.getPhone(),
                     a.getDoctorId(),
-                    doc != null ? doc.getName() : "Doctor #" + a.getDoctorId(),
+                    doc != null ? doc.getName() : "Attending Doctor",
                     doc != null && doc.getSpecialization() != null ? doc.getSpecialization() : "General",
                     doc != null ? doc.getEmail() : "",
                     a.getAppointmentDate(),

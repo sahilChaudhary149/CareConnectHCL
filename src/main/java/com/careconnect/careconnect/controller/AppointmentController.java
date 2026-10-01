@@ -114,7 +114,7 @@ public class AppointmentController {
                     patient != null ? patient.getEmail() : "",
                     patient != null ? patient.getPhone() : "",
                     a.getDoctorId(),
-                    doctor != null ? doctor.getName() : "Doctor #" + a.getDoctorId(),
+                    doctor != null ? doctor.getName() : "Attending Doctor",
                     doctor != null && doctor.getSpecialization() != null ? doctor.getSpecialization() : "General",
                     doctor != null ? doctor.getEmail() : "",
                     a.getAppointmentDate(),
