@@ -37,8 +37,32 @@ public class CareconnectApplication {
 			AppointmentRepository appointmentRepository,
 			MedicalRecordRepository medicalRecordRepository,
 			PrescriptionRepository prescriptionRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
 		return args -> {
+
+			// Load full real database entries (34 users, 93 appts, 84 records, 85 rx) if fresh database
+			if (userRepository.count() < 30) {
+				try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(
+						new org.springframework.core.io.ClassPathResource("data_full.sql").getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+					String line;
+					int loadedCount = 0;
+					while ((line = reader.readLine()) != null) {
+						line = line.trim();
+						if (line.startsWith("INSERT INTO")) {
+							try {
+								jdbcTemplate.execute(line);
+								loadedCount++;
+							} catch (Exception ex) {
+								// continue on duplicate key or syntax variation
+							}
+						}
+					}
+					System.out.println(">>> CareConnect Full Database Seeder: Successfully loaded " + loadedCount + " records from data_full.sql! Total users: " + userRepository.count());
+				} catch (Exception e) {
+					System.err.println(">>> Error loading data_full.sql: " + e.getMessage());
+				}
+			}
 
 			// 0. Auto-upgrade any existing legacy plaintext passwords to secure BCrypt hashes
 			List<User> allDbUsers = userRepository.findAll();
